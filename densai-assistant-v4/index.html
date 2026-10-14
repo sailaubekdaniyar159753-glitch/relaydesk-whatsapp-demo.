@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#081326">
 <meta name="description" content="Тестовая версия интерактивного мультяшного ассистента DenSai Studio. Собрана на базе оригинального изображения персонажа.">
 <title>DenSai Studio — интерактивный помощник (тест)</title>
-<link rel="preload" href="assets/idle.webp" as="image" type="image/webp">
 <style>
 :root{color-scheme:dark;font-family:Inter,system-ui,-apple-system,'Segoe UI',Arial,sans-serif;color:#eef9ff;background:#081326}*{box-sizing:border-box}
 html{scroll-behavior:smooth}body{margin:0;overflow-x:hidden;background:radial-gradient(circle at 75% 8%,#17446b9e,transparent 35%),radial-gradient(circle at 20% 55%,#0b2751a1,transparent 46%),#081326;min-height:100svh}
@@ -53,7 +52,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-tools{display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:auto;margin-top:-7px;position:relative}
 #densai-helper-root .ds-open{background:linear-gradient(105deg,#0875c8,#03bcf4);border:1px solid #8cf3ff;border-radius:22px;padding:10px 15px;white-space:nowrap;font-weight:750;font-size:12px;box-shadow:0 3px 19px #0abfff99;color:white}
 #densai-helper-root .ds-sound{background:#112e48e8;border:1px solid #346784;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;font-size:16px;padding:0}
-#densai-helper-root .ds-window{pointer-events:auto;display:none;position:absolute;bottom:calc(100% + 11px);right:0;width:min(365px,calc(100vw - 24px));max-height:min(590px,calc(100svh - 38px));overflow:hidden;flex-direction:column;background:#09182af7;color:#eefaff;border:1px solid #47c9ff;border-radius:20px;box-shadow:0 20px 55px #000c,0 0 20px #04c3ff25;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
+#densai-helper-root .ds-window{pointer-events:auto;display:none;position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));right:clamp(190px,calc(1.8vw + 175px),220px);width:min(365px,calc(100vw - 24px));max-height:min(590px,calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));overflow:hidden;flex-direction:column;background:#09182af7;color:#eefaff;border:1px solid #47c9ff;border-radius:20px;box-shadow:0 20px 55px #000c,0 0 20px #04c3ff25;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
 #densai-helper-root .ds-window[data-open="true"]{display:flex;animation:ds-panel-in .2s ease-out}
 #densai-helper-root .ds-head{display:flex;gap:9px;align-items:center;padding:13px 14px;border-bottom:1px solid #234960}
 #densai-helper-root .ds-avatar{width:40px;height:40px;flex:none;border-radius:50%;border:1px solid #35cfff;object-fit:cover;object-position:center 30%;background:#102f48}
