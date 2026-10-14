@@ -130,7 +130,24 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   footer.append(telegram,make('small','','Обычный консультант, без ИИ'));
   panel.append(head,conversation,chips,form,footer);
   root.append(shell,panel);
-  function addBubble(msg, who='bot') {const el=make('div','ds-bubble',msg);el.dataset.who=who;conversation.appendChild(el);conversation.scrollTop=conversation.scrollHeight;return el}
+  function addBubble(msg, who='bot') {
+    const el=make('div','ds-bubble');el.dataset.who=who;
+    if(who==='bot'){
+      // Link only our verified demo/portfolio domains and official Telegram contact.
+      // Build nodes without innerHTML, so visitor messages cannot inject markup.
+      const links=/(https:\/\/(?:densai-neon-hunt|densai-studio-kz-pro)\.vercel\.app\/?|@Densai10\b)/gi;
+      let cursor=0;
+      for(const match of msg.matchAll(links)){
+        if(match.index>cursor)el.append(document.createTextNode(msg.slice(cursor,match.index)));
+        const a=make('a','',match[0]);
+        a.href=match[0].startsWith('@')?'https://t.me/Densai10':match[0];
+        a.target='_blank';a.rel='noopener noreferrer';el.append(a);
+        cursor=match.index+match[0].length;
+      }
+      if(cursor<msg.length)el.append(document.createTextNode(msg.slice(cursor)));
+    }else el.textContent=msg;
+    conversation.appendChild(el);conversation.scrollTop=conversation.scrollHeight;return el;
+  }
   const text={
     games:'🎮 Разрабатываем небольшие HTML5/JavaScript мини-игры, квизы и 2D-прототипы. Пример готовой игры — NEON HUNT: https://densai-neon-hunt.vercel.app/',
     bots:'🤖 Есть прототипы веб-консультантов и Telegram-ботов для FAQ, записи и сбора заявок. Полноценные подключения к Telegram, CRM и оплате делаются только после согласования ТЗ и интеграций.',
