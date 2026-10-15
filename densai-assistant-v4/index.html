@@ -111,6 +111,28 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root[data-minimized="true"] .ds-person,#densai-helper-root[data-minimized="true"] .ds-hint{display:none}
 #densai-helper-root[data-minimized="true"] .ds-tools{margin-top:8px}
 #densai-helper-root[data-minimized="true"] .ds-minimize{top:-23px}
+
+/* Compact landscape / short viewport: keep message field and close button reachable. */
+@media (max-height:420px) {
+ #densai-helper-root .ds-window {
+   position:fixed;
+   top:calc(6px + env(safe-area-inset-top,0px));
+   bottom:auto;
+   height:calc(100dvh - 12px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+   max-height:calc(100dvh - 12px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+ }
+ #densai-helper-root .ds-head{flex:0 0 auto;padding:5px 9px;gap:6px}
+ #densai-helper-root .ds-avatar{width:28px;height:28px}
+ #densai-helper-root .ds-heading small{display:none}
+ #densai-helper-root .ds-exit{width:32px;height:32px}
+ #densai-helper-root .ds-conversation{flex:1 1 auto;min-height:0;max-height:none;padding:7px 9px;overflow-y:auto}
+ #densai-helper-root .ds-picks{flex:0 0 auto;max-height:0;padding:0;overflow:hidden}
+ #densai-helper-root .ds-form{flex:0 0 auto;padding:5px 7px}
+ #densai-helper-root .ds-question{padding:7px 8px}
+ #densai-helper-root .ds-footer{flex:0 0 auto;padding:0 7px 6px}
+ #densai-helper-root .ds-footer a{padding:5px 8px}
+ #densai-helper-root .ds-footer small{display:none}
+}
 </style></head>
 <body>
 <nav><a class="brand" href="https://densai-studio-kz-pro.vercel.app/">♛ Den<span>Sai</span><small>STUDIO</small></a><div class="menu"><a href="#services">Услуги</a><a href="https://densai-neon-hunt.vercel.app/">Мини-игра</a><a href="https://densai-studio-kz-pro.vercel.app/">Портфолио</a></div><a class="nav-cta" href="https://t.me/Densai10" target="_blank" rel="noopener">✈ Связаться</a></nav>
