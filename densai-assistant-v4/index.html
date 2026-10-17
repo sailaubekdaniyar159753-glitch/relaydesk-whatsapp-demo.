@@ -59,6 +59,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-person.ds-idle .ds-head-layer{animation:ds-head-breathe 4.5s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-idle .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-idle .ds-arm-right{animation:ds-arm-idle-right 4.5s ease-in-out infinite}
+
+/* Speaking motion is driven by actual browser speech start/end events. */
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit) .ds-head-layer{animation:ds-speech-nod .68s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit) .ds-arm-right{animation:ds-speech-gesture 1.25s ease-in-out infinite}
+@keyframes ds-speech-nod{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(1.3px) rotate(-1.4deg)}65%{transform:translateY(-1px) rotate(1.2deg)}}
+@keyframes ds-speech-gesture{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-5deg) translateY(-2px)}70%{transform:rotate(2deg) translateY(0)}}
+
 #densai-helper-root .ds-hit-star{position:absolute;right:2px;top:42px;color:#ffcd5a;opacity:0;font-size:28px;pointer-events:none}
 #densai-helper-root .ds-person.ds-hit .ds-hit-star{animation:ds-star .65s ease-out}
 #densai-helper-root .ds-tools{display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:auto;margin-top:-7px;position:relative}
@@ -226,12 +233,24 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=false; // No unsolicited sounds. Voice requires an explicit visitor action.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  function say(s){if(muted||!('speechSynthesis' in window))return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(s.replace(/[^\p{L}\p{N}\s!,.\-]/gu,''));u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;speechSynthesis.speak(u)}catch(e){}}
+  let speechToken=0;
+  function stopSpeech(){speechToken++;character.classList.remove('ds-speaking');if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
+  function say(s){
+    if(muted||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
+    stopSpeech();const token=speechToken;
+    try{
+      const u=new SpeechSynthesisUtterance(s.replace(/[^\p{L}\p{N}\s!,.\-]/gu,''));u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
+      u.onstart=()=>{if(token===speechToken&&!muted)character.classList.add('ds-speaking')};
+      const done=()=>{if(token===speechToken)character.classList.remove('ds-speaking')};
+      u.onend=done;u.onerror=done;
+      speechSynthesis.speak(u);
+    }catch(e){character.classList.remove('ds-speaking')}
+  }
   function reset(){character.classList.remove('ds-hit');character.classList.add('ds-idle')}
   function poke(){hits++;clearTimeout(animationTimer);character.classList.remove('ds-idle','ds-hit');void character.offsetWidth;character.classList.add('ds-hit');const line=lines[(hits-1)%lines.length];hint.textContent=line;say(line);animationTimer=setTimeout(()=>{reset();hint.textContent='Нажми ещё 😄'},1450)}
   function toggle(force){const value=typeof force==='boolean'?force:panel.dataset.open!=='true';panel.dataset.open=String(value);open.setAttribute('aria-expanded',String(value));if(value){hint.textContent='Я здесь! 👋';if(!window.matchMedia('(pointer: coarse)').matches)input.focus({preventScroll:true})}else{open.focus({preventScroll:true})}}
   minimize.addEventListener('click',()=>{const next=root.dataset.minimized!=='true';root.dataset.minimized=String(next);minimize.textContent=next?'+':'−';minimize.setAttribute('aria-label',next?'Развернуть персонажа':'Свернуть персонажа')});character.addEventListener('click',poke);open.addEventListener('click',()=>toggle());exit.addEventListener('click',()=>toggle(false));
-  sound.addEventListener('click',()=>{muted=!muted;sound.textContent=muted?'🔇':'🔊';sound.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');if(muted&&'speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){};if(!muted)say('Привет! Я DenSai!')});
+  sound.addEventListener('click',()=>{muted=!muted;sound.textContent=muted?'🔇':'🔊';sound.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');if(muted)stopSpeech();if(!muted)say('Привет! Я DenSai!')});
   form.addEventListener('submit',(e)=>{e.preventDefault();const q=input.value.trim();if(!q)return;respond(q,text[classify(q)]);input.value='';input.focus()});
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&panel.dataset.open==='true')toggle(false)});
   const addToDom=()=>document.body.appendChild(root);
