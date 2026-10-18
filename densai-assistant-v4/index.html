@@ -60,6 +60,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-person.ds-idle .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-idle .ds-arm-right{animation:ds-arm-idle-right 4.5s ease-in-out infinite}
 
+
+/* A short acknowledgment after a chat reply. Speech and hit animations take priority. */
+#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking) .ds-head-layer{animation:ds-ack-head .68s ease-in-out 1}
+#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking) .ds-arm-right{animation:ds-ack-hand .68s ease-in-out 1}
+@keyframes ds-ack-head{0%,100%{transform:translate3d(0,0,0) rotate(0)}30%{transform:translate3d(0,1.2px,0) rotate(-1.8deg)}65%{transform:translate3d(0,-.8px,0) rotate(.8deg)}}
+@keyframes ds-ack-hand{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-4deg) translateY(-1.5px)}70%{transform:rotate(1.5deg) translateY(0)}}
+
 /* Speaking motion is driven by actual browser speech start/end events. */
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit) .ds-head-layer{animation:ds-speech-nod .68s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit) .ds-arm-right{animation:ds-speech-gesture 1.25s ease-in-out infinite}
@@ -228,7 +235,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     ];
     const found=patterns.find(([_, re])=>re.test(q));return found?found[0]:'default';
   }
-  function respond(question,response){addBubble(question,'guest');addBubble(response);}
+  let replyGestureTimer=null;
+  function acknowledgeReply(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches || character.classList.contains('ds-hit') || character.classList.contains('ds-speaking'))return;
+    clearTimeout(replyGestureTimer);
+    character.classList.remove('ds-ack');
+    void character.offsetWidth;
+    character.classList.add('ds-ack');
+    replyGestureTimer=setTimeout(()=>character.classList.remove('ds-ack'),720);
+  }
+  function respond(question,response){addBubble(question,'guest');addBubble(response);acknowledgeReply();}
   addBubble('Привет! 👋 Я помощник DenSai Studio. Расскажу об услугах или помогу связаться с разработчиком. Что интересует?');
   let muted=false; // No unsolicited sounds. Voice requires an explicit visitor action.
   let hits=0, animationTimer=null;
