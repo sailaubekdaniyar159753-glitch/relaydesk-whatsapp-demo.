@@ -166,12 +166,17 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   const shell = make('div','ds-character-shell');
   const hint=make('div','ds-hint','Привет! 👋 Тыкни на меня!');hint.setAttribute('aria-live','polite');
   const character=make('button','ds-person ds-idle');character.type='button';character.setAttribute('aria-label','Нажать на мультяшного DenSai');
+  const motionPreference=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const mascotFrame=()=>motionPreference.matches?assets.poster:assets.idle;
   const rig=make('span','ds-rig');
-  const base=make('img','ds-base');base.alt='Мультяшный DenSai в пушистой куртке';base.src=assets.idle;base.loading='eager';base.decoding='async';
-  const headLayer=make('img','ds-head-layer');headLayer.alt='';headLayer.src=assets.idle;headLayer.loading='eager';headLayer.decoding='async';
-  const armLeft=make('img','ds-arm ds-arm-left');armLeft.alt='';armLeft.src=assets.idle;
-  const armRight=make('img','ds-arm ds-arm-right');armRight.alt='';armRight.src=assets.idle;
+  const base=make('img','ds-base');base.alt='Мультяшный DenSai в пушистой куртке';base.src=mascotFrame();base.loading='eager';base.decoding='async';
+  const headLayer=make('img','ds-head-layer');headLayer.alt='';headLayer.src=mascotFrame();headLayer.loading='eager';headLayer.decoding='async';
+  const armLeft=make('img','ds-arm ds-arm-left');armLeft.alt='';armLeft.src=mascotFrame();
+  const armRight=make('img','ds-arm ds-arm-right');armRight.alt='';armRight.src=mascotFrame();
   for(const el of [base,headLayer,armLeft,armRight]){el.onerror=()=>{if(el.src!==assets.poster)el.src=assets.poster}}
+  const refreshMotionFrames=()=>{const frame=mascotFrame();for(const el of [base,headLayer,armLeft,armRight]){if(el.src!==frame)el.src=frame}};
+  if(typeof motionPreference.addEventListener==='function')motionPreference.addEventListener('change',refreshMotionFrames);
+  else if(typeof motionPreference.addListener==='function')motionPreference.addListener(refreshMotionFrames);
   rig.append(base,armLeft,armRight,headLayer);
   const star=make('span','ds-hit-star','✦');star.setAttribute('aria-hidden','true');character.append(rig,star);
   const tools=make('div','ds-tools');const open=make('button','ds-open','💬 Спросить DenSai');open.type='button';open.setAttribute('aria-expanded','false');open.setAttribute('aria-controls','densai-dialog');
