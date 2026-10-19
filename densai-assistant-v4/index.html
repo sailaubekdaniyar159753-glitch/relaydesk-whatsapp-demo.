@@ -274,6 +274,17 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   sound.addEventListener('click',()=>{muted=!muted;sound.textContent=muted?'🔇':'🔊';sound.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');if(muted)stopSpeech();if(!muted)say('Привет! Я DenSai!')});
   form.addEventListener('submit',(e)=>{e.preventDefault();const q=input.value.trim();if(!q)return;respond(q,text[classify(q)]);input.value='';input.focus()});
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&panel.dataset.open==='true')toggle(false)});
+  // Pause browser speech and transient gestures when hidden; never auto-resume.
+  function suspendAnimations(){
+    stopSpeech();
+    clearTimeout(replyGestureTimer);
+    clearTimeout(animationTimer);
+    character.classList.remove('ds-ack');
+    reset();
+    hint.textContent='Привет! 👋 Тыкни на меня!';
+  }
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendAnimations()});
+  window.addEventListener('pagehide',suspendAnimations);
   const addToDom=()=>document.body.appendChild(root);
   if(document.body)addToDom();else document.addEventListener('DOMContentLoaded',addToDom,{once:true});
 })();
