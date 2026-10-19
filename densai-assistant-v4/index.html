@@ -180,7 +180,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   rig.append(base,armLeft,armRight,headLayer);
   const star=make('span','ds-hit-star','✦');star.setAttribute('aria-hidden','true');character.append(rig,star);
   const tools=make('div','ds-tools');const open=make('button','ds-open','💬 Спросить DenSai');open.type='button';open.setAttribute('aria-expanded','false');open.setAttribute('aria-controls','densai-dialog');
-  const sound=make('button','ds-sound','🔊');sound.type='button';sound.setAttribute('aria-label','Отключить звук');sound.title='Включить или отключить голос';tools.append(open,sound);
+  const sound=make('button','ds-sound','🔇');sound.type='button';sound.setAttribute('aria-label','Включить звук');sound.title='Включить или отключить голос';tools.append(open,sound);
   const minimize=make('button','ds-minimize','−');minimize.type='button';minimize.setAttribute('aria-label','Свернуть персонажа');shell.append(hint,character,tools,minimize);
   const panel=make('section','ds-window');panel.id='densai-dialog';panel.dataset.open='false';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Чат с помощником DenSai');
   const head=make('div','ds-head'),avatar=make('img','ds-avatar');avatar.src=assets.poster;avatar.alt='';
@@ -256,9 +256,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     character.classList.add('ds-ack');
     replyGestureTimer=setTimeout(()=>character.classList.remove('ds-ack'),720);
   }
-  function respond(question,response){addBubble(question,'guest');addBubble(response);acknowledgeReply();}
+  function respond(question,response){addBubble(question,'guest');addBubble(response);acknowledgeReply();if(!muted)say(response);}
   addBubble('Привет! 👋 Я помощник DenSai Studio. Расскажу об услугах или помогу связаться с разработчиком. Что интересует?');
-  let muted=false; // No unsolicited sounds. Voice requires an explicit visitor action.
+  let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
   let speechToken=0;
