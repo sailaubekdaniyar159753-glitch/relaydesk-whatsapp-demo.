@@ -265,7 +265,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let speechToken=0;
   function stopSpeech(){speechToken++;character.classList.remove('ds-speaking');if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
   function say(s){
-    if(muted||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
+    if(muted||root.dataset.minimized==='true'||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
     stopSpeech();const token=speechToken;
     try{
       const u=new SpeechSynthesisUtterance(s.replace(/[^\p{L}\p{N}\s!,.\-]/gu,''));u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
