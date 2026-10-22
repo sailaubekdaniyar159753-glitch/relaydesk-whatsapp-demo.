@@ -68,10 +68,19 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @keyframes ds-ack-hand{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-4deg) translateY(-1.5px)}70%{transform:rotate(1.5deg) translateY(0)}}
 
 /* Speaking motion is driven by actual browser speech start/end events. */
-#densai-helper-root .ds-person.ds-speaking:not(.ds-hit) .ds-head-layer{animation:ds-speech-nod .68s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-speaking:not(.ds-hit) .ds-arm-right{animation:ds-speech-gesture 1.25s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-head-layer{animation:ds-speech-nod .68s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-arm-right{animation:ds-speech-gesture 1.25s ease-in-out infinite}
 @keyframes ds-speech-nod{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(1.3px) rotate(-1.4deg)}65%{transform:translateY(-1px) rotate(1.2deg)}}
 @keyframes ds-speech-gesture{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-5deg) translateY(-2px)}70%{transform:rotate(2deg) translateY(0)}}
+/* Prefer small, word-timed motions where speech boundary events are available.
+   Browsers without boundary events retain the existing continuous fallback. */
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse) .ds-head-layer,
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse) .ds-arm-right{animation:none}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-layer{animation:ds-word-nod .27s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-arm-right{animation:ds-word-hand .3s ease-out 1}
+@keyframes ds-word-nod{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(-1.5deg)}}
+@keyframes ds-word-hand{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(-4deg) translateY(-1px)}}
+
 
 #densai-helper-root .ds-hit-star{position:absolute;right:2px;top:42px;color:#ffcd5a;opacity:0;font-size:28px;pointer-events:none}
 #densai-helper-root .ds-person.ds-hit .ds-hit-star{animation:ds-star .65s ease-out}
@@ -262,15 +271,30 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  let speechToken=0;
-  function stopSpeech(){speechToken++;character.classList.remove('ds-speaking');if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
+  let speechToken=0, speechBeatTimer=null, lastWordBeat=-Infinity;
+  function clearSpeechMotion(){
+    clearTimeout(speechBeatTimer);speechBeatTimer=null;
+    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse');
+  }
+  function stopSpeech(){speechToken++;clearSpeechMotion();if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
   function say(s){
     if(muted||root.dataset.minimized==='true'||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
-    stopSpeech();const token=speechToken;
+    stopSpeech();lastWordBeat=-Infinity;const token=speechToken;
     try{
       const u=new SpeechSynthesisUtterance(s.replace(/[^\p{L}\p{N}\s!,.\-]/gu,''));u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
-      u.onstart=()=>{if(token===speechToken&&!muted)character.classList.add('ds-speaking')};
-      const done=()=>{if(token===speechToken)character.classList.remove('ds-speaking')};
+      u.onstart=()=>{if(token===speechToken&&!muted&&root.dataset.minimized!=='true'&&!document.hidden)character.classList.add('ds-speaking')};
+      // Word boundaries are emitted by some browser voices, but not all.
+      u.onboundary=(event)=>{
+        if(token!==speechToken||muted||root.dataset.minimized==='true'||document.hidden||motionPreference.matches||!character.classList.contains('ds-speaking')||(event.name&&event.name!=='word'))return;
+        const now=performance.now();if(now-lastWordBeat<160)return;lastWordBeat=now;
+        character.classList.add('ds-word-mode');
+        character.classList.remove('ds-word-pulse');
+        void character.offsetWidth;
+        character.classList.add('ds-word-pulse');
+        clearTimeout(speechBeatTimer);
+        speechBeatTimer=setTimeout(()=>{if(token===speechToken)character.classList.remove('ds-word-pulse')},320);
+      };
+      const done=()=>{if(token===speechToken)clearSpeechMotion()};
       u.onend=done;u.onerror=done;
       speechSynthesis.speak(u);
     }catch(e){character.classList.remove('ds-speaking')}
