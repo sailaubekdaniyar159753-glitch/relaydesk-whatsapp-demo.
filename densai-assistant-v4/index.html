@@ -271,9 +271,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  let speechToken=0, speechBeatTimer=null, lastWordBeat=-Infinity;
+  let speechToken=0, speechBeatTimer=null, speechFallbackTimer=null, lastWordBeat=-Infinity;
   function clearSpeechMotion(){
     clearTimeout(speechBeatTimer);speechBeatTimer=null;
+    clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
     character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
@@ -293,6 +294,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         character.classList.add('ds-word-pulse');
         clearTimeout(speechBeatTimer);
         speechBeatTimer=setTimeout(()=>{if(token===speechToken)character.classList.remove('ds-word-pulse')},320);
+        // Some voices emit one boundary and then fall silent; resume the gentle fallback.
+        clearTimeout(speechFallbackTimer);
+        speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse')},700);
       };
       const done=()=>{if(token===speechToken)clearSpeechMotion()};
       u.onend=done;u.onerror=done;
