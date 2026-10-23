@@ -56,9 +56,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-person.ds-hit .ds-arm-left{animation:ds-arm-left-hit .72s cubic-bezier(.18,.86,.18,1)}
 #densai-helper-root .ds-person.ds-hit .ds-arm-right{animation:ds-arm-right-hit .72s cubic-bezier(.18,.86,.18,1)}
 #densai-helper-root .ds-person.ds-idle .ds-rig{animation:ds-float 4.5s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-idle .ds-head-layer{animation:ds-head-breathe 4.5s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-idle .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-idle .ds-arm-right{animation:ds-arm-idle-right 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-head-layer{animation:ds-head-breathe 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-arm-right{animation:ds-arm-idle-right 4.5s ease-in-out infinite}
 
 
 /* A short acknowledgment after a chat reply. Speech and hit animations take priority. */
@@ -74,8 +74,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @keyframes ds-speech-gesture{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-5deg) translateY(-2px)}70%{transform:rotate(2deg) translateY(0)}}
 /* Prefer small, word-timed motions where speech boundary events are available.
    Browsers without boundary events retain the existing continuous fallback. */
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse) .ds-head-layer,
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse) .ds-arm-right{animation:none}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-head-layer,
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-arm-right{animation:none}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-layer{animation:ds-word-nod .27s ease-out 1}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-arm-right{animation:ds-word-hand .3s ease-out 1}
 @keyframes ds-word-nod{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(-1.5deg)}}
