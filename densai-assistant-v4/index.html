@@ -262,7 +262,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // A website with a contact form, CRM or messenger button is still a website request.
     // Only an explicit bot/chat request should outrank a site mention.
     const siteIntent=patterns.find(([key])=>key==='sites')[1].test(q);
-    const explicitBot=/(?:^|[^\p{L}])(?:бот(?:а|у|е|ом|ы|ов|ам|ами|ах|ик(?:а|и|ов)?)?|чат(?:а|е|у|ом|ы|ов|ам|ами|ах)?)(?=$|[^\p{L}])|чат[-\s]?бот/iu.test(q);
+    const explicitBot=/(?:^|[^\p{L}])бот(?:а|у|е|ом|ы|ов|ам|ами|ах|ик(?:а|и|ов)?)?(?=$|[^\p{L}])|чат[-\s]?бот|(?:создать|разработать|сделать)\s+чат(?:а|е|у|ом)?(?=$|[^\p{L}])/iu.test(q);
+    // Explicit requests for examples or contact details outrank the service mentioned.
+    // Keep price/time questions first, including "примерно сколько стоит".
+    const priority=patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
+    if(priority)return priority;
+    if(/портфоли|(?:^|[^\p{L}])демо(?=$|[^\p{L}])|пример(?:ы|ов|а)?\s+(?:ваших?|работ|проект|сайт|бот|игр|видео|ролик)|(?:покаж(?:и|ите)|посмотр(?:еть|ю))[^.!?]{0,50}(?:пример|работы|портфоли|демо)/iu.test(q))return 'portfolio';
+    if(/(?:^|[^\p{L}])контакт(?:ы|ов|ам|ами|ах)?(?=$|[^\p{L}])|контактн(?:ые|ую|ой)\s+данн(?:ые|ых)|(?:как|где|можно)\s+(?:с\s+вами\s+)?связаться|связаться\s+с\s+вами|куда\s+(?:мне\s+)?написать|как\s+(?:вам|тебе|с\s+вами)\s+написать|(?:ваш|ваши|вашего)\s+(?:телеграм|telegram|номер|телефон)|телефон/iu.test(q))return 'contact';
     const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
