@@ -259,7 +259,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       ['greeting',/(^|\s)(привет|здравствуй(?:те)?|добрый\s+(?:день|вечер|утро)|hello|hi)(?:\s|[!?. ,]|$)/i],
       ['thanks',/(спасибо|благодарю|thank\s+you|thanks)/i]
     ];
-    const found=patterns.find(([_, re])=>re.test(q));return found?found[0]:'default';
+    // A website with a contact form, CRM or messenger button is still a website request.
+    // Only an explicit bot/chat request should outrank a site mention.
+    const siteIntent=patterns.find(([key])=>key==='sites')[1].test(q);
+    const explicitBot=/(?:^|[^\p{L}])(?:бот(?:а|у|е|ом|ы|ов|ам|ами|ах|ик(?:а|и|ов)?)?|чат(?:а|е|у|ом|ы|ов|ам|ами|ах)?)(?=$|[^\p{L}])|чат[-\s]?бот/iu.test(q);
+    const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
   function acknowledgeReply(){
