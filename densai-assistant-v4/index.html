@@ -247,7 +247,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   for (const [label,key] of chipsMap){const b=make('button','',label);b.type='button';b.addEventListener('click',()=>respond(label,text[key]));chips.appendChild(b)}
   function classify(q){
     const patterns=[
-      ['price',/(цена|стоим|ценник|сколько|оплат|бюджет|прайс|тенге|тг\b)/i],
+      ['price',/(цена|стоим|стоить|стоит|ценник|сколько\s+(?:стоит|будет\s+стоить|денег|тенге|за(?:\s|$))|оплат|бюджет|прайс|тенге|тг(?:\s|$))/i],
+      ['time',/(срок|быстр|скоро|когда|дней|часов|врем|длит|займ[её]т)/i],
       ['games',/(игр|arcade|квиз|2d|html5|javascript|неон|neon|гейм|canvas|мини.?апп|mini.?app)/i],
       ['bots',/(бот|чат|telegram|телеграм|автоматиз|crm|запис|заявк|faq|whatsapp|ватсап)/i],
       ['sites',/(сайт|лендинг|страниц|веб|интернет.?магазин|landing|домен|vercel)/i],
@@ -255,7 +256,6 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       ['video',/(видео|монтаж|ролик|реклам|reels|shorts|тикток|tiktok|озвучк)/i],
       ['portfolio',/(портфоли|пример|работы|покажи|демо)/i],
       ['contact',/(контакт|связ|написать|адрес|телефон|где вы|откуда|казахстан)/i],
-      ['time',/(срок|быстр|скоро|когда|дней|часов|врем)/i],
       ['greeting',/(^|\s)(привет|здравствуй(?:те)?|добрый\s+(?:день|вечер|утро)|hello|hi)(?:\s|[!?. ,]|$)/i],
       ['thanks',/(спасибо|благодарю|thank\s+you|thanks)/i]
     ];
