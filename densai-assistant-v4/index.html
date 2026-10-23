@@ -322,10 +322,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         clearTimeout(speechFallbackTimer);
         speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left')},700);
       };
-      const done=()=>{if(token===speechToken)clearSpeechMotion()};
+      const done=()=>{if(token===speechToken){speechToken++;clearSpeechMotion()}};
       u.onend=done;
       u.onerror=(event)=>{
         if(token!==speechToken)return;
+        speechToken++; // Invalidate late callbacks after an error or cancellation.
         clearSpeechMotion();
         // Canceled or interrupted speech should not disable a healthy voice toggle.
         if(event&&['interrupted','canceled'].includes(event.error))return;
