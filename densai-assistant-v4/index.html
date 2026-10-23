@@ -294,13 +294,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;const token=speechToken;
     try{
       const u=new SpeechSynthesisUtterance(s.replace(/[^\p{L}\p{N}\s!,.\-]/gu,''));u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
-      u.onstart=()=>{if(token===speechToken&&!muted&&root.dataset.minimized!=='true'&&!document.hidden)character.classList.add('ds-speaking')};
+      let speechPaused=false;
+      u.onstart=()=>{if(token===speechToken&&!speechPaused&&!muted&&root.dataset.minimized!=='true'&&!document.hidden)character.classList.add('ds-speaking')};
       // Browser speech may pause without ending; freeze the rig until the voice resumes.
-      u.onpause=()=>{if(token===speechToken)clearSpeechMotion()};
-      u.onresume=()=>{if(token===speechToken&&!muted&&root.dataset.minimized!=='true'&&!document.hidden)character.classList.add('ds-speaking')};
+      u.onpause=()=>{if(token===speechToken){speechPaused=true;clearSpeechMotion()}};
+      u.onresume=()=>{if(token===speechToken&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){speechPaused=false;character.classList.add('ds-speaking')}};
       // Word boundaries are emitted by some browser voices, but not all.
       u.onboundary=(event)=>{
-        if(token!==speechToken||muted||root.dataset.minimized==='true'||document.hidden||motionPreference.matches||!character.classList.contains('ds-speaking')||(event.name&&event.name!=='word'))return;
+        if(token!==speechToken||speechPaused||muted||root.dataset.minimized==='true'||document.hidden||motionPreference.matches||(event.name&&event.name!=='word'))return;
+        // Some speech engines emit word boundaries before onstart: accept them as speech evidence.
+        if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
         const now=performance.now();if(now-lastWordBeat<160)return;lastWordBeat=now;
         character.classList.add('ds-word-mode');
         character.classList.remove('ds-word-pulse');
