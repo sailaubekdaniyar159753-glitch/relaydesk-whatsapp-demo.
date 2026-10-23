@@ -133,10 +133,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @media(max-width:650px){
  #densai-helper-root .ds-window{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));bottom:auto;right:10px;width:calc(100vw - 20px);max-height:calc(100svh - 24px - env(safe-area-inset-top,0px));}
 }
+@media(max-width:650px){
 #densai-helper-root .ds-minimize{display:grid;place-items:center;right:0;top:5px;z-index:2;color:#b8d8ec;pointer-events:auto;font-size:15px}
 #densai-helper-root[data-minimized="true"] .ds-person,#densai-helper-root[data-minimized="true"] .ds-hint{display:none}
 #densai-helper-root[data-minimized="true"] .ds-tools{margin-top:8px}
 #densai-helper-root[data-minimized="true"] .ds-minimize{top:-23px}
+}
 
 /* Compact landscape / short viewport: keep message field and close button reachable. */
 @media (max-height:420px) {
