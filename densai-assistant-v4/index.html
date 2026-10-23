@@ -280,6 +280,15 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
+  function reportSpeechFailure(){
+    clearSpeechMotion();
+    muted=true;
+    sound.textContent='🔇';
+    sound.setAttribute('aria-label','Включить звук');
+    sound.setAttribute('aria-pressed','false');
+    sound.title='Озвучка не сработала. Нажмите, чтобы попробовать снова';
+    hint.textContent='Озвучка недоступна. Попробуй ещё раз 🔇';
+  }
   function say(s){
     if(muted||root.dataset.minimized==='true'||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
     stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;const token=speechToken;
@@ -306,9 +315,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left')},700);
       };
       const done=()=>{if(token===speechToken)clearSpeechMotion()};
-      u.onend=done;u.onerror=done;
+      u.onend=done;
+      u.onerror=(event)=>{
+        if(token!==speechToken)return;
+        clearSpeechMotion();
+        // Canceled or interrupted speech should not disable a healthy voice toggle.
+        if(event&&['interrupted','canceled'].includes(event.error))return;
+        reportSpeechFailure();
+      };
       speechSynthesis.speak(u);
-    }catch(e){character.classList.remove('ds-speaking')}
+    }catch(e){reportSpeechFailure()}
   }
   function reset(){character.classList.remove('ds-hit');character.classList.add('ds-idle')}
   function poke(){hits++;clearTimeout(animationTimer);character.classList.remove('ds-idle','ds-hit');void character.offsetWidth;character.classList.add('ds-hit');const line=lines[(hits-1)%lines.length];hint.textContent=line;say(line);animationTimer=setTimeout(()=>{reset();hint.textContent='Нажми ещё 😄'},1450)}
