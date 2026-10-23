@@ -77,8 +77,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-head-layer,
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-arm-right{animation:none}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-layer{animation:ds-word-nod .27s ease-out 1}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit):not(.ds-word-left) .ds-arm-right{animation:ds-word-hand .3s ease-out 1}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-word-left:not(.ds-hit) .ds-arm-left{animation:ds-word-hand-left .3s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse:not(.ds-hit):not(.ds-word-left) .ds-arm-right{animation:ds-word-hand .3s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse.ds-word-left:not(.ds-hit) .ds-arm-left{animation:ds-word-hand-left .3s ease-out 1}
 @keyframes ds-word-nod{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(-1.5deg)}}
 @keyframes ds-word-hand{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(-4deg) translateY(-1px)}}
 @keyframes ds-word-hand-left{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(4deg) translateY(-1px)}}
@@ -308,12 +308,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  let speechToken=0, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, lastWordBeat=-Infinity, wordHandLeft=false;
+  let speechToken=0, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0;
   function clearSpeechMotion(){
     clearTimeout(speechBeatTimer);speechBeatTimer=null;
     clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
     clearTimeout(speechStartTimer);speechStartTimer=null;
-    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left');
+    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
   function reportSpeechFailure(){
@@ -327,7 +327,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   }
   function say(s){
     if(muted||root.dataset.minimized==='true'||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
-    stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;const token=speechToken;
+    stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;wordBoundaryCount=0;const token=speechToken;
     try{
       const spoken=s.replace(/https?:\/\/[^\s]+/gi,'ссылка есть в чате').replace(/[^\p{L}\p{N}\s!?,.:;\-]/gu,'').replace(/\s+/g,' ').replace(/\s+\./g,'.').trim();
       const u=new SpeechSynthesisUtterance(spoken);u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
@@ -348,15 +348,18 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         const now=performance.now();if(now-lastWordBeat<160)return;lastWordBeat=now;
         character.classList.add('ds-word-mode');
         character.classList.remove('ds-word-pulse');
-        wordHandLeft=!wordHandLeft;
-        character.classList.toggle('ds-word-left',wordHandLeft);
+        wordBoundaryCount++;
+        // Head follows each word; hands gesture only on every fourth word.
+        const handGesture=wordBoundaryCount%4===1;
+        character.classList.toggle('ds-hand-pulse',handGesture);
+        if(handGesture){wordHandLeft=!wordHandLeft;character.classList.toggle('ds-word-left',wordHandLeft);}
         void character.offsetWidth;
         character.classList.add('ds-word-pulse');
         clearTimeout(speechBeatTimer);
-        speechBeatTimer=setTimeout(()=>{if(token===speechToken)character.classList.remove('ds-word-pulse')},320);
+        speechBeatTimer=setTimeout(()=>{if(token===speechToken)character.classList.remove('ds-word-pulse','ds-hand-pulse')},320);
         // Some voices emit one boundary and then fall silent; resume the gentle fallback.
         clearTimeout(speechFallbackTimer);
-        speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left')},700);
+        speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse')},700);
       };
       const done=()=>{if(token===speechToken){speechToken++;clearSpeechMotion()}};
       u.onend=done;
