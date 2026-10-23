@@ -161,6 +161,15 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
  #densai-helper-root .ds-footer a{padding:5px 8px}
  #densai-helper-root .ds-footer small{display:none}
 }
+
+/* Follow the visible mobile viewport when the on-screen keyboard opens. */
+@media(max-width:650px){
+#densai-helper-root .ds-window{top:calc(var(--ds-vv-top,0px) + 12px + env(safe-area-inset-top,0px));max-height:calc(var(--ds-vv-height,100svh) - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+#densai-helper-root[data-compact-viewport="true"] .ds-window{top:calc(var(--ds-vv-top,0px) + 6px);height:auto;max-height:calc(var(--ds-vv-height,100svh) - 12px)}
+#densai-helper-root[data-compact-viewport="true"] .ds-head{padding:6px 10px}
+#densai-helper-root[data-compact-viewport="true"] .ds-conversation{min-height:0;max-height:none}
+#densai-helper-root[data-compact-viewport="true"] .ds-picks,#densai-helper-root[data-compact-viewport="true"] .ds-footer{display:none}
+}
 </style></head>
 <body>
 <nav><a class="brand" href="https://densai-studio-kz-pro.vercel.app/">♛ Den<span>Sai</span><small>STUDIO</small></a><div class="menu"><a href="#services">Услуги</a><a href="https://densai-neon-hunt.vercel.app/">Мини-игра</a><a href="https://densai-studio-kz-pro.vercel.app/">Портфолио</a></div><a class="nav-cta" href="https://t.me/Densai10" target="_blank" rel="noopener">✈ Связаться</a></nav>
@@ -208,6 +217,20 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   footer.append(telegram,make('small','','Обычный консультант, без ИИ'));
   panel.append(head,conversation,chips,form,footer);
   root.append(shell,panel);
+  // Keep the message field visible above the mobile software keyboard.
+  const syncChatViewport=()=>{
+    const vv=window.visualViewport;
+    if(!vv||!Number.isFinite(vv.height)||vv.height<120)return;
+    root.style.setProperty('--ds-vv-top',Math.max(0,vv.offsetTop).toFixed(1)+'px');
+    root.style.setProperty('--ds-vv-height',vv.height.toFixed(1)+'px');
+    root.dataset.compactViewport=String(vv.height<480);
+  };
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize',syncChatViewport);
+    window.visualViewport.addEventListener('scroll',syncChatViewport);
+    syncChatViewport();
+  }
+
   function addBubble(msg, who='bot') {
     const el=make('div','ds-bubble');el.dataset.who=who;
     if(who==='bot'){
