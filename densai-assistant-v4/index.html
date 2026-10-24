@@ -412,7 +412,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const q=input.value.trim();if(!q)return;
     respond(q,text[classify(q)]);input.value='';input.focus();
   });
-  document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&panel.dataset.open==='true'&&!e.isComposing&&!composingMessage)toggle(false)});
+  document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&panel.dataset.open==='true'&&!e.isComposing&&e.keyCode!==229&&!isImeConfirming())toggle(false)});
   // Pause browser speech and transient gestures when hidden; never auto-resume.
   function suspendAnimations(){
     stopSpeech();
