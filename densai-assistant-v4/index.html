@@ -306,6 +306,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       if(/видео|монтаж|ролик|reels|shorts|тикток|tiktok|озвучк/i.test(q))return 'video';
       if(/дизайн|баннер|карточк|облож|логотип|фото|изображен|превью|картинк/i.test(q))return 'design';
     }
+    // JavaScript, HTML5 and canvas are also website technologies, not only game technologies.
+    // Keep actual game-development briefs in the games category.
+    if(siteIntent&&!explicitBot&&/(?:javascript|html5|canvas)/i.test(q)&&!/(игр|гейм|квиз|arcade|мини.?апп|mini.?app|neon|неон)/i.test(q))return 'sites';
     const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
