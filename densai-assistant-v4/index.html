@@ -389,12 +389,29 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   sound.addEventListener('click',()=>{if(!voiceSupported)return;muted=!muted;sound.textContent=muted?'🔇':'🔊';sound.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');sound.setAttribute('aria-pressed',String(!muted));sound.title=muted?'Включить звук':'Отключить звук';if(muted)stopSpeech();if(!muted)say('Привет! Я DenSai!')});
   // IME candidates can finish composition just before Enter reaches keydown (Safari).
   // Ignore that confirming Enter, but allow a normal Enter shortly afterward.
-  let composingMessage=false, lastCompositionEnd=-Infinity;
+  let composingMessage=false, lastCompositionEnd=-Infinity, lastExplicitSend=-Infinity;
   const isImeConfirming=()=>composingMessage||performance.now()-lastCompositionEnd<180;
   input.addEventListener('compositionstart',()=>{composingMessage=true});
   input.addEventListener('compositionend',()=>{composingMessage=false;lastCompositionEnd=performance.now()});
-  input.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&(e.isComposing||e.keyCode===229||isImeConfirming()))e.preventDefault()});
-  form.addEventListener('submit',(e)=>{e.preventDefault();if(isImeConfirming())return;const q=input.value.trim();if(!q)return;respond(q,text[classify(q)]);input.value='';input.focus()});
+  // An intentional Send-button activation must work even immediately after IME selection.
+  // Implicit form submission from Enter in the input has no button pointer/keyboard activation.
+  send.addEventListener('pointerdown',()=>{lastExplicitSend=performance.now()});
+  send.addEventListener('click',(e)=>{if(e.detail>0)lastExplicitSend=performance.now()});
+  send.addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' ')lastExplicitSend=performance.now()});
+  input.addEventListener('keydown',(e)=>{
+    if(e.key==='Enter'){
+      lastExplicitSend=-Infinity;
+      if(e.isComposing||e.keyCode===229||isImeConfirming())e.preventDefault();
+    }
+  });
+  form.addEventListener('submit',(e)=>{
+    e.preventDefault();
+    const explicitSend=performance.now()-lastExplicitSend<1000;
+    lastExplicitSend=-Infinity;
+    if(composingMessage||(isImeConfirming()&&!explicitSend))return;
+    const q=input.value.trim();if(!q)return;
+    respond(q,text[classify(q)]);input.value='';input.focus();
+  });
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&panel.dataset.open==='true'&&!e.isComposing&&!composingMessage)toggle(false)});
   // Pause browser speech and transient gestures when hidden; never auto-resume.
   function suspendAnimations(){
