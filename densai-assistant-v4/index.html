@@ -68,10 +68,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @keyframes ds-ack-hand{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-4deg) translateY(-1.5px)}70%{transform:rotate(1.5deg) translateY(0)}}
 
 /* Speaking motion is driven by actual browser speech start/end events. */
+/* When a voice has no word-boundary events, alternate restrained gestures between hands. */
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-head-layer{animation:ds-speech-nod .68s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-arm-right{animation:ds-speech-gesture 1.25s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-arm-left{animation:ds-speech-gesture-left 2.6s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-arm-right{animation:ds-speech-gesture 2.6s ease-in-out infinite}
 @keyframes ds-speech-nod{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(1.3px) rotate(-1.4deg)}65%{transform:translateY(-1px) rotate(1.2deg)}}
-@keyframes ds-speech-gesture{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-5deg) translateY(-2px)}70%{transform:rotate(2deg) translateY(0)}}
+@keyframes ds-speech-gesture-left{0%,44%,100%{transform:rotate(0) translateY(0)}14%{transform:rotate(4deg) translateY(-1.5px)}28%{transform:rotate(-1deg) translateY(0)}}
+@keyframes ds-speech-gesture{0%,50%,100%{transform:rotate(0) translateY(0)}64%{transform:rotate(-4deg) translateY(-1.5px)}78%{transform:rotate(1deg) translateY(0)}94%{transform:rotate(0) translateY(0)}}
 /* Prefer small, word-timed motions where speech boundary events are available.
    Browsers without boundary events retain the existing continuous fallback. */
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-head-layer,
