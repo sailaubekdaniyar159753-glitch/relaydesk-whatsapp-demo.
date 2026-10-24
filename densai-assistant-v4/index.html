@@ -293,6 +293,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Keep price/time questions first, including "примерно сколько стоит".
     const priority=patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // A portfolio website is a site order, not a request to view our own portfolio.
+    if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*[-\s]+портфолио|(?:сайт|лендинг)\s+для\s+портфолио|портфолио[-\s]+(?:сайт|лендинг)/iu.test(q) && !/(?:покаж|посмотр|пример|(?:ваш|ваше|вашего)\s+портфолио)/iu.test(q))return 'sites';
     if(/портфоли|(?:^|[^\p{L}])демо(?=$|[^\p{L}])|пример(?:ы|ов|а)?\s+(?:ваших?|работ|проект|сайт|бот|игр|видео|ролик)|(?:покаж(?:и|ите)|посмотр(?:еть|ю))[^.!?]{0,50}(?:пример|работы|портфоли|демо)/iu.test(q))return 'portfolio';
     if(/(?:^|[^\p{L}])контакт(?:ы|ов|ам|ами|ах)?(?=$|[^\p{L}])|контактн(?:ые|ую|ой)\s+данн(?:ые|ых)|(?:как|где|можно)\s+(?:с\s+вами\s+)?связаться|связаться\s+с\s+вами|куда\s+(?:мне\s+)?написать|как\s+(?:вам|тебе|с\s+вами)\s+написать|(?:ваш|ваши|вашего)\s+(?:телеграм|telegram|номер|телефон)|телефон/iu.test(q))return 'contact';
     // Recording a video is media production, not appointment-booking automation.
