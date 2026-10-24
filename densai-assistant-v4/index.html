@@ -294,6 +294,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(/(?:^|[^\p{L}])контакт(?:ы|ов|ам|ами|ах)?(?=$|[^\p{L}])|контактн(?:ые|ую|ой)\s+данн(?:ые|ых)|(?:как|где|можно)\s+(?:с\s+вами\s+)?связаться|связаться\s+с\s+вами|куда\s+(?:мне\s+)?написать|как\s+(?:вам|тебе|с\s+вами)\s+написать|(?:ваш|ваши|вашего)\s+(?:телеграм|telegram|номер|телефон)|телефон/iu.test(q))return 'contact';
     // Recording a video is media production, not appointment-booking automation.
     if(!explicitBot && /запис/iu.test(q) && /(видео|ролик|монтаж|подкаст|экран|озвучк|reels|shorts|youtube|ютуб)/iu.test(q) && !/(клиент|заявк|при[её]м|брон|crm|автоматиз)/iu.test(q))return 'video';
+    // Messenger/CRM is often just the delivery channel for a video or design job.
+    // Keep explicit chatbot requests and website requests on their existing routes.
+    if(!explicitBot && !siteIntent){
+      if(/видео|монтаж|ролик|reels|shorts|тикток|tiktok|озвучк/i.test(q))return 'video';
+      if(/дизайн|баннер|карточк|облож|логотип|фото|изображен|превью|картинк/i.test(q))return 'design';
+    }
     const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
