@@ -385,6 +385,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         if(boundaryIndex>=0&&boundaryIndex<=lastBoundaryIndex)return;
         // Remember throttled offsets too, so a delayed duplicate cannot replay an old gesture.
         if(boundaryIndex>=0)lastBoundaryIndex=boundaryIndex;
+        // Every fresh word extends the inactivity window, even if its gesture is throttled.
+        clearTimeout(speechFallbackTimer);
+        speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse')},700);
         if(now-lastWordBeat<160)return;
         lastWordBeat=now;
         character.classList.add('ds-word-mode');
@@ -398,9 +401,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         character.classList.add('ds-word-pulse');
         clearTimeout(speechBeatTimer);
         speechBeatTimer=setTimeout(()=>{if(token===speechToken)character.classList.remove('ds-word-pulse','ds-hand-pulse')},320);
-        // Some voices emit one boundary and then fall silent; resume the gentle fallback.
-        clearTimeout(speechFallbackTimer);
-        speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse')},700);
+        // If the voice stops reporting words, the timer restores gentle fallback motion.
       };
       const done=()=>{if(token===speechToken){speechToken++;clearSpeechMotion()}};
       u.onend=done;
