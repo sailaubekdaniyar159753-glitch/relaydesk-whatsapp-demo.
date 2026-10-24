@@ -387,7 +387,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   function toggle(force){const value=typeof force==='boolean'?force:panel.dataset.open!=='true';panel.dataset.open=String(value);open.setAttribute('aria-expanded',String(value));if(value){hint.textContent='Я здесь! 👋';if(window.matchMedia('(pointer: coarse)').matches)exit.focus({preventScroll:true});else input.focus({preventScroll:true})}else{stopSpeech();clearTimeout(replyGestureTimer);character.classList.remove('ds-ack');open.focus({preventScroll:true})}}
   minimize.addEventListener('click',()=>{const next=root.dataset.minimized!=='true';if(next)suspendAnimations();root.dataset.minimized=String(next);minimize.textContent=next?'+':'−';minimize.setAttribute('aria-label',next?'Развернуть персонажа':'Свернуть персонажа');minimize.setAttribute('aria-expanded',String(!next))});character.addEventListener('click',poke);open.addEventListener('click',()=>toggle());exit.addEventListener('click',()=>toggle(false));
   sound.addEventListener('click',()=>{if(!voiceSupported)return;muted=!muted;sound.textContent=muted?'🔇':'🔊';sound.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');sound.setAttribute('aria-pressed',String(!muted));sound.title=muted?'Включить звук':'Отключить звук';if(muted)stopSpeech();if(!muted)say('Привет! Я DenSai!')});
-  form.addEventListener('submit',(e)=>{e.preventDefault();const q=input.value.trim();if(!q)return;respond(q,text[classify(q)]);input.value='';input.focus()});
+  // Do not send an unfinished IME composition when Enter selects a candidate.
+  let composingMessage=false;
+  input.addEventListener('compositionstart',()=>{composingMessage=true});
+  input.addEventListener('compositionend',()=>{composingMessage=false});
+  input.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&(e.isComposing||composingMessage))e.preventDefault()});
+  form.addEventListener('submit',(e)=>{e.preventDefault();if(composingMessage)return;const q=input.value.trim();if(!q)return;respond(q,text[classify(q)]);input.value='';input.focus()});
   document.addEventListener('keydown',(e)=>{if(e.key==='Escape'&&panel.dataset.open==='true')toggle(false)});
   // Pause browser speech and transient gestures when hidden; never auto-resume.
   function suspendAnimations(){
