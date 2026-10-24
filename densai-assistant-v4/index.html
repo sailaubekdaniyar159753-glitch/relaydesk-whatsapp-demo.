@@ -291,7 +291,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const explicitBot=/(?:^|[^\p{L}])бот(?:а|у|е|ом|ы|ов|ам|ами|ах|ик(?:а|и|ов)?)?(?=$|[^\p{L}])|чат[-\s]?бот|(?:создать|разработать|сделать)\s+чат(?:а|е|у|ом)?(?=$|[^\p{L}])/iu.test(q);
     // Explicit requests for examples or contact details outrank the service mentioned.
     // Keep price/time questions first, including "примерно сколько стоит".
-    const priority=patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
+    // Prices, payments and deadlines inside a product brief are features, not estimates.
+    const featureBrief=/(?:^|[\s,])(?:с|со|для|под)\s+(?:[\p{L}\p{N}-]+\s+){0,4}(?:стоим\p{L}*|цен\p{L}*|оплат\p{L}*|прайс[\p{L}-]*|срок\p{L}*|врем\p{L}*)/iu.test(q);
+    const asksTime=/(?:сколько\s+(?:времени|дней|часов|недель|месяцев)|каки[её]\s+срок|как\s+(?:быстро|долго)|когда\s+(?:будет|готов|сдела|можно)|(?:подскажите|узнать|интересует)\s+(?:мне\s+)?(?:срок|врем)|срок\p{L}*\s*\?)/iu.test(q);
+    const asksPrice=/(?:сколько\s+(?:стоит|будет\s+стоить|денег|тенге)|каков[аы]?\s+(?:цен|стоим)|(?:цен|стоим)\p{L}*\s*\?|(?:узнать|интересует|подскажите|скажите)\s+(?:мне\s+)?(?:цен|стоим))/iu.test(q);
+    const featureNotEstimate=featureBrief&&!asksTime&&!asksPrice;
+    const priority=asksTime?'time':asksPrice?'price':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
     // A site WITH an embedded chatbot is a website brief; a chatbot FOR a site is a bot brief.
     // Do not override price/time questions or independent chatbot requests.
@@ -319,7 +324,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // JavaScript, HTML5 and canvas are also website technologies, not only game technologies.
     // Keep actual game-development briefs in the games category.
     if(siteIntent&&!explicitBot&&/(?:javascript|html5|canvas)/i.test(q)&&!/(игр|гейм|квиз|arcade|мини.?апп|mini.?app|neon|неон)/i.test(q))return 'sites';
-    const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&re.test(q));return found?found[0]:'default';
+    const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&!(featureNotEstimate&&(key==='price'||key==='time'))&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
   function acknowledgeReply(){
