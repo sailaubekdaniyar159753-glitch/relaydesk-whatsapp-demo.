@@ -293,6 +293,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Keep price/time questions first, including "примерно сколько стоит".
     const priority=patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // A site WITH an embedded chatbot is a website brief; a chatbot FOR a site is a bot brief.
+    // Do not override price/time questions or independent chatbot requests.
+    if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*\s+(?:с|со)\s+(?:(?:встроенн\p{L}*|интегрированн\p{L}*|умн\p{L}*|ai|ии)\s+){0,2}(?:чат[-\s]?бот\p{L}*|(?:(?:telegram|телеграм|whatsapp|ватсап)[-\s]?)?бот\p{L}*)/iu.test(q))return 'sites';
     // A portfolio website is a site order, not a request to view our own portfolio.
     if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*[-\s]+портфолио|(?:сайт|лендинг)\s+для\s+портфолио|портфолио[-\s]+(?:сайт|лендинг)/iu.test(q) && !/(?:покаж|посмотр|пример|(?:ваш|ваше|вашего)\s+портфолио)/iu.test(q))return 'sites';
     if(/портфоли|(?:^|[^\p{L}])демо(?=$|[^\p{L}])|пример(?:ы|ов|а)?\s+(?:ваших?|работ|проект|сайт|бот|игр|видео|ролик)|(?:покаж(?:и|ите)|посмотр(?:еть|ю))[^.!?]{0,50}(?:пример|работы|портфоли|демо)/iu.test(q))return 'portfolio';
