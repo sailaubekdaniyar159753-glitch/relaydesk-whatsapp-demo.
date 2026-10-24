@@ -364,8 +364,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Voices without a usable offset (-1) still use the timed fallback.
         const boundaryIndex=Number.isFinite(event.charIndex)?event.charIndex:-1;
         if(boundaryIndex>=0&&boundaryIndex<=lastBoundaryIndex)return;
-        if(now-lastWordBeat<160)return;
+        // Remember throttled offsets too, so a delayed duplicate cannot replay an old gesture.
         if(boundaryIndex>=0)lastBoundaryIndex=boundaryIndex;
+        if(now-lastWordBeat<160)return;
         lastWordBeat=now;
         character.classList.add('ds-word-mode');
         character.classList.remove('ds-word-pulse');
