@@ -363,7 +363,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Deduplicate repeated offsets, including zero (the first word).
         // Voices without a usable offset (-1) still use the timed fallback.
         const boundaryIndex=Number.isFinite(event.charIndex)?event.charIndex:-1;
-        if(boundaryIndex>=0&&boundaryIndex===lastBoundaryIndex)return;
+        if(boundaryIndex>=0&&boundaryIndex<=lastBoundaryIndex)return;
         if(now-lastWordBeat<160)return;
         if(boundaryIndex>=0)lastBoundaryIndex=boundaryIndex;
         lastWordBeat=now;
