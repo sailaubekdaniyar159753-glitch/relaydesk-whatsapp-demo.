@@ -495,7 +495,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       },12000);
       speechOwnsUtterance=true;
       speechSynthesis.speak(u);
-    }catch(e){stopSpeech();reportSpeechFailure()}
+    }catch(e){
+      // A synchronous speech API failure does not prove that our utterance was queued.
+      // Avoid canceling unrelated speech using the page's shared synthesizer.
+      speechOwnsUtterance=false;
+      speechToken++;
+      reportSpeechFailure();
+    }
   }
   function reset(){character.classList.remove('ds-hit');character.classList.add('ds-idle')}
   function poke(){hits++;clearTimeout(animationTimer);character.classList.remove('ds-idle','ds-hit');void character.offsetWidth;character.classList.add('ds-hit');const line=lines[(hits-1)%lines.length];hint.textContent=line;say(line);animationTimer=setTimeout(()=>{reset();hint.textContent='Нажми ещё 😄'},1450)}
