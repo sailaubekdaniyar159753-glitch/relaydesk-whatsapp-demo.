@@ -279,7 +279,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       ['time',/(срок|быстр|скоро|когда|дней|часов|(?:^|[^\p{L}])врем(?:я|ени|енем|енах|ена)(?=$|[^\p{L}])|длит|займ[её]т)/iu],
       ['games',/(игр|arcade|квиз|2d|неон|neon|гейм|мини.?апп|mini.?app)/i],
       ['bots',/(?:^|[^\p{L}])(?:бот(?:а|у|е|ом|ы|ов|ам|ами|ах|ик(?:а|и|ов)?)?|чат(?:а|е|у|ом|ы|ов|ам|ами|ах)?)(?=$|[^\p{L}])|чат[-\s]?бот|telegram|телеграм|автоматиз|crm|запис|заявк|faq|whatsapp|ватсап/iu],
-      ['sites',/(сайт|лендинг|страниц|веб|интернет.?магазин|landing|домен|vercel)/i],
+      ['sites',/(сайт|лендинг|страниц|веб[-\s]?(?:сайт|страниц|разработк|дизайн|приложен|проект|студи|форм|магазин|сервис|портал|ресурс|интерфейс|лендинг|витрин)|интернет.?магазин|landing|домен|vercel)/i],
       ['design',/(дизайн|баннер|карточк|облож|логотип|график|фото|изображен|превью|картинк)/i],
       ['video',/(видео|монтаж|ролик|реклам|reels|shorts|тикток|tiktok|озвучк)/i],
       ['portfolio',/(портфоли|пример|работы|покажи|демо)/i],
@@ -326,7 +326,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Messenger/CRM is often just the delivery channel for a video or design job.
     // Keep explicit chatbot requests and website requests on their existing routes.
     if(!explicitBot && !siteIntent){
-      if(/видео|монтаж|ролик|reels|shorts|тикток|tiktok|озвучк/i.test(q))return 'video';
+      if(/видео|монтаж|монтир|ролик|вебинар|веб[-\s]?камер|reels|shorts|тикток|tiktok|озвучк/i.test(q))return 'video';
       if(/дизайн|баннер|карточк|облож|логотип|фото|изображен|превью|картинк/i.test(q))return 'design';
     }
     // JavaScript, HTML5 and canvas are also website technologies, not only game technologies.
