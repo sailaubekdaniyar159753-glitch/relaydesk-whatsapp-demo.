@@ -412,6 +412,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // advancing speech elapsedTime, while rejecting duplicate or older events.
         const boundaryIndex=Number.isFinite(event.charIndex)?event.charIndex:-1;
         const boundaryElapsed=Number.isFinite(event.elapsedTime)?event.elapsedTime:-1;
+        // Frozen boundary metadata may drive a gesture, but must not keep a stuck voice alive.
+        const speechProgress=(boundaryIndex>=0&&boundaryIndex!==lastBoundaryIndex)||
+          (boundaryElapsed>=0&&(lastBoundaryElapsed<0||boundaryElapsed>lastBoundaryElapsed+0.08));
         // Reject late word events with older speech time, even when their index increases.
         if(boundaryElapsed>=0&&lastBoundaryElapsed>=0&&boundaryElapsed+0.02<lastBoundaryElapsed)return;
         if(boundaryIndex<0){
@@ -436,9 +439,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         }
         // Only accepted word events confirm speech activity and extend the watchdog.
         // Rejected duplicates/stale events must not cancel the startup check.
-        clearTimeout(speechStartTimer);speechStartTimer=null;
+        if(speechProgress){clearTimeout(speechStartTimer);speechStartTimer=null;keepSpeechAlive();}
         if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
-        keepSpeechAlive();
         // Remember throttled words too; missing offsets still use timed gestures.
         if(boundaryElapsed>=0)lastBoundaryElapsed=boundaryElapsed;
         // Reduced-motion users still need speech activity tracking, without visual gestures.
