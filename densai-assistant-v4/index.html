@@ -393,7 +393,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       u.onresume=()=>{if(token===speechToken&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){speechPaused=false;character.classList.add('ds-speaking');keepSpeechAlive()}};
       // Word boundaries are emitted by some browser voices, but not all.
       u.onboundary=(event)=>{
-        if(token!==speechToken||speechPaused||muted||root.dataset.minimized==='true'||document.hidden||motionPreference.matches||(event.name&&event.name!=='word'))return;
+        if(token!==speechToken||speechPaused||muted||root.dataset.minimized==='true'||document.hidden||(event.name&&event.name!=='word'))return;
         // Some speech engines emit word boundaries before onstart: accept them as speech evidence.
         clearTimeout(speechStartTimer);speechStartTimer=null;
         if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
@@ -428,6 +428,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         keepSpeechAlive();
         // Remember throttled words too; missing offsets still use timed gestures.
         if(boundaryElapsed>=0)lastBoundaryElapsed=boundaryElapsed;
+        // Reduced-motion users still need speech activity tracking, without visual gestures.
+        if(motionPreference.matches)return;
         // Every fresh word extends the inactivity window, even if its gesture is throttled.
         clearTimeout(speechFallbackTimer);
         speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse')},700);
