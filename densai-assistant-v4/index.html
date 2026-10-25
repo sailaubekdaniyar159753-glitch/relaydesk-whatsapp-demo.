@@ -349,7 +349,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  let speechToken=0, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity;
+  let speechToken=0, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
   function clearSpeechMotion(){
     clearTimeout(speechBeatTimer);speechBeatTimer=null;
     clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
@@ -368,7 +368,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   }
   function say(s){
     if(muted||root.dataset.minimized==='true'||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
-    stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;wordBoundaryCount=0;lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;const token=speechToken;
+    stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;wordBoundaryCount=0;lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;const token=speechToken;
     try{
       const spoken=s.replace(/https?:\/\/[^\s]+/gi,'ссылка есть в чате').replace(/[^\p{L}\p{N}\s!?,.:;\-]/gu,'').replace(/\s+/g,' ').replace(/\s+\./g,'.').trim();
       const u=new SpeechSynthesisUtterance(spoken);u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
@@ -393,9 +393,14 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         const boundaryElapsed=Number.isFinite(event.elapsedTime)?event.elapsedTime:-1;
         if(boundaryIndex>=0){
           if(boundaryIndex<lastBoundaryIndex)return;
-          if(boundaryIndex===lastBoundaryIndex &&
-             !(boundaryElapsed>=0&&boundaryElapsed>lastBoundaryElapsed+0.08))return;
+          // Some engines freeze both offsets at zero. Accept later word events
+          // by wall-clock spacing, but still reject immediate duplicates.
+          const elapsedAdvanced=boundaryElapsed>=0&&boundaryElapsed>lastBoundaryElapsed+0.08;
+          const metadataStalled=boundaryElapsed<0||boundaryElapsed===lastBoundaryElapsed;
+          if(boundaryIndex===lastBoundaryIndex&&!elapsedAdvanced&&
+             !(metadataStalled&&now-lastBoundaryWall>=220))return;
           lastBoundaryIndex=boundaryIndex;
+          lastBoundaryWall=now;
         }
         // Remember throttled words too; missing offsets still use timed gestures.
         if(boundaryElapsed>=0)lastBoundaryElapsed=boundaryElapsed;
