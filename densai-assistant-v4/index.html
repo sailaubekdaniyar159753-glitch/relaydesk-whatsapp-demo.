@@ -298,6 +298,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const featureNotEstimate=featureBrief&&!asksTime&&!asksPrice;
     const priority=asksTime?'time':asksPrice?'price':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // Asking to SEE an example is not an order to BUILD the example.
+    if(/(?:^|[\s,.!?])(?:пример(?:ы|ов|а)?|покажи(?:те)?|посмотр(?:еть|ю))\s+(?:(?:ваш(?:их|и)?|готов(?:ых|ые)?|работ(?:ы|у)?)\s+){0,3}(?:сайт(?:а|ов|ы)?|лендинг(?:а|ов|и)?|чат[-\s]?бот(?:а|ов|ы)?|работ(?:ы|у)?|портфолио)(?=$|[^\p{L}])/iu.test(q))return 'portfolio';
     // A site WITH an embedded chatbot is a website brief; a chatbot FOR a site is a bot brief.
     // Do not override price/time questions or independent chatbot requests.
     if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*\s+(?:с|со)\s+(?:(?:встроенн\p{L}*|интегрированн\p{L}*|умн\p{L}*|ai|ии)\s+){0,2}(?:чат[-\s]?бот\p{L}*|(?:(?:telegram|телеграм|whatsapp|ватсап)[-\s]?)?бот\p{L}*)/iu.test(q))return 'sites';
@@ -306,7 +308,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(explicitBot&&/(?:^|\s)(?:чат[-\s]?бот|бот)\s+(?:для|на)\s+(?:сайт|лендинг)/iu.test(q))return 'bots';
     if(siteIntent&&/(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*\s+(?:с|со)\s+(?:(?:встроенн\p{L}*|небольш\p{L}*|мини[-\s]?|html5|2d|javascript|интерактивн\p{L}*)\s*){0,3}(?:игр\p{L}*|квиз\p{L}*|game\p{L}*)/iu.test(q))return 'sites';
     // A portfolio website is a site order, not a request to view our own portfolio.
-    if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*[-\s]+портфолио|(?:сайт|лендинг)\s+для\s+портфолио|портфолио[-\s]+(?:сайт|лендинг)/iu.test(q) && !/(?:покаж|посмотр|пример|(?:ваш|ваше|вашего)\s+портфолио)/iu.test(q))return 'sites';
+    if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*[-\s]+портфолио|(?:сайт|лендинг)\s+для\s+портфолио|портфолио[-\s]+(?:сайт|лендинг)|(?:страниц|сайт|лендинг)\p{L}*\s+(?:для|под)\s+(?:(?:моего|своего)\s+)?портфолио/iu.test(q) && !/(?:покаж|посмотр|пример|(?:ваш|ваше|вашего)\s+портфолио)/iu.test(q))return 'sites';
     if(/портфоли|(?:^|[^\p{L}])демо(?=$|[^\p{L}])|пример(?:ы|ов|а)?\s+(?:ваших?|работ|проект|сайт|бот|игр|видео|ролик)|(?:покаж(?:и|ите)|посмотр(?:еть|ю))[^.!?]{0,50}(?:пример|работы|портфоли|демо)/iu.test(q))return 'portfolio';
     const personalContactRequest=/(?:как|где|можно)\s+(?:с\s+вами\s+)?связаться|связаться\s+с\s+вами|куда\s+(?:мне\s+)?написать|как\s+(?:вам|тебе|с\s+вами)\s+написать|(?:ваш|ваши|вашего)\s+(?:телеграм|telegram|номер|телефон|контакт)|контакт(?:ы)?\s+(?:для\s+(?:заказа|связи)|densai|студии)|(?:дайте|скиньте|пришлите)\s+(?:ваши\s+)?контакт/iu.test(q);
     if((!siteIntent||personalContactRequest)&&/(?:^|[^\p{L}])контакт(?:ы|ов|ам|ами|ах)?(?=$|[^\p{L}])|контактн(?:ые|ую|ой)\s+данн(?:ые|ых)|(?:как|где|можно)\s+(?:с\s+вами\s+)?связаться|связаться\s+с\s+вами|куда\s+(?:мне\s+)?написать|как\s+(?:вам|тебе|с\s+вами)\s+написать|(?:ваш|ваши|вашего)\s+(?:телеграм|telegram|номер|телефон)|телефон/iu.test(q))return 'contact';
