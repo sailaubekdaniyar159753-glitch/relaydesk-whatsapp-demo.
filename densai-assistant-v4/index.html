@@ -404,6 +404,14 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         const boundaryElapsed=Number.isFinite(event.elapsedTime)?event.elapsedTime:-1;
         // Reject late word events with older speech time, even when their index increases.
         if(boundaryElapsed>=0&&lastBoundaryElapsed>=0&&boundaryElapsed+0.02<lastBoundaryElapsed)return;
+        if(boundaryIndex<0){
+          // Missing word offsets: throttle repeated frozen/absent metadata.
+          // This reduces duplicate gestures and unnecessary watchdog resets.
+          const elapsedAdvanced=boundaryElapsed>=0&&boundaryElapsed>lastBoundaryElapsed+0.08;
+          const metadataStalled=boundaryElapsed<0||boundaryElapsed===lastBoundaryElapsed;
+          if(!elapsedAdvanced&&!(metadataStalled&&now-lastBoundaryWall>=220))return;
+          lastBoundaryWall=now;
+        }
         if(boundaryIndex>=0){
           // Some engines restart charIndex at each sentence while elapsedTime keeps advancing.
           if(boundaryIndex<lastBoundaryIndex && !(boundaryElapsed>=0&&boundaryElapsed>lastBoundaryElapsed+0.08))return;
