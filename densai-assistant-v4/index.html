@@ -80,9 +80,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-head-layer,
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-arm-right{animation:none}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-layer{animation:ds-word-nod .27s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-word-tilt:not(.ds-hit) .ds-head-layer{animation:ds-word-nod-tilt .27s ease-out 1}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse:not(.ds-hit):not(.ds-word-left) .ds-arm-right{animation:ds-word-hand .3s ease-out 1}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse.ds-word-left:not(.ds-hit) .ds-arm-left{animation:ds-word-hand-left .3s ease-out 1}
 @keyframes ds-word-nod{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(-1.5deg)}}
+@keyframes ds-word-nod-tilt{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(1.5deg)}}
 @keyframes ds-word-hand{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(-4deg) translateY(-1px)}}
 @keyframes ds-word-hand-left{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(4deg) translateY(-1px)}}
 
@@ -352,7 +354,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     clearTimeout(speechBeatTimer);speechBeatTimer=null;
     clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
     clearTimeout(speechStartTimer);speechStartTimer=null;
-    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse');
+    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
   function reportSpeechFailure(){
@@ -399,6 +401,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         character.classList.add('ds-word-mode');
         character.classList.remove('ds-word-pulse');
         wordBoundaryCount++;
+        // Alternate a subtle head tilt every two accepted words to avoid robotic repetition.
+        character.classList.toggle('ds-word-tilt',Math.floor(wordBoundaryCount/2)%2===1);
         // Head follows each word; hands gesture only on every fourth word.
         const handGesture=wordBoundaryCount%4===1;
         character.classList.toggle('ds-hand-pulse',handGesture);
