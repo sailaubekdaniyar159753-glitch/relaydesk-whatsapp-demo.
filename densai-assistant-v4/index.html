@@ -388,7 +388,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           hint.textContent='Озвучка остановлена: голосовой движок не завершил ответ.';
         },90000);
       };
-      u.onstart=()=>{if(token===speechToken&&!speechPaused&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){clearTimeout(speechStartTimer);speechStartTimer=null;character.classList.add('ds-speaking');keepSpeechAlive()}};
+      u.onstart=()=>{if(token===speechToken&&!speechPaused&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;character.classList.add('ds-speaking');keepSpeechAlive()}};
       // Browser speech may pause without ending; freeze the rig until the voice resumes.
       // Some voices pause without ever resuming or ending. Avoid an orphaned
       // utterance holding the sound control in an apparently active state.
@@ -439,7 +439,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         }
         // Only accepted word events confirm speech activity and extend the watchdog.
         // Rejected duplicates/stale events must not cancel the startup check.
-        if(speechProgress){clearTimeout(speechStartTimer);speechStartTimer=null;keepSpeechAlive();}
+        if(speechProgress){clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;keepSpeechAlive();}
         if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
         // Remember throttled words too; missing offsets still use timed gestures.
         if(boundaryElapsed>=0)lastBoundaryElapsed=boundaryElapsed;
@@ -479,7 +479,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // Confirm activity after 12s; do not disable a voice that is genuinely speaking.
       speechStartTimer=setTimeout(()=>{
         if(token!==speechToken||muted||document.hidden)return;
-        if(speechSynthesis.paused)return;
+        if(speechSynthesis.paused){
+          // Some engines queue an utterance while globally paused without firing onpause.
+          // Bound this otherwise untracked wait, and clear it when speech actually begins.
+          speechPauseTimer=setTimeout(()=>{
+            if(token!==speechToken||muted||document.hidden)return;
+            stopSpeech();
+            hint.textContent='Озвучка остановлена: голосовой движок не начал ответ после паузы.';
+          },90000);
+          return;
+        }
         if(speechSynthesis.speaking){character.classList.add('ds-speaking');keepSpeechAlive();return;}
         stopSpeech();reportSpeechFailure();
       },12000);
