@@ -394,9 +394,6 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // Word boundaries are emitted by some browser voices, but not all.
       u.onboundary=(event)=>{
         if(token!==speechToken||speechPaused||muted||root.dataset.minimized==='true'||document.hidden||(event.name&&event.name!=='word'))return;
-        // Some speech engines emit word boundaries before onstart: accept them as speech evidence.
-        clearTimeout(speechStartTimer);speechStartTimer=null;
-        if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
         const now=performance.now();
         // Some voices report charIndex=0 for every word. Distinguish new words by
         // advancing speech elapsedTime, while rejecting duplicate or older events.
@@ -424,7 +421,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           lastBoundaryIndex=boundaryIndex;
           lastBoundaryWall=now;
         }
-        // Only accepted word events extend the watchdog; stale events must not keep a stuck voice alive.
+        // Only accepted word events confirm speech activity and extend the watchdog.
+        // Rejected duplicates/stale events must not cancel the startup check.
+        clearTimeout(speechStartTimer);speechStartTimer=null;
+        if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
         keepSpeechAlive();
         // Remember throttled words too; missing offsets still use timed gestures.
         if(boundaryElapsed>=0)lastBoundaryElapsed=boundaryElapsed;
