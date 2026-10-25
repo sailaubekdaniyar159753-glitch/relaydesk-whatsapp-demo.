@@ -403,6 +403,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // advancing speech elapsedTime, while rejecting duplicate or older events.
         const boundaryIndex=Number.isFinite(event.charIndex)?event.charIndex:-1;
         const boundaryElapsed=Number.isFinite(event.elapsedTime)?event.elapsedTime:-1;
+        // Reject late word events with older speech time, even when their index increases.
+        if(boundaryElapsed>=0&&lastBoundaryElapsed>=0&&boundaryElapsed+0.02<lastBoundaryElapsed)return;
         if(boundaryIndex>=0){
           // Some engines restart charIndex at each sentence while elapsedTime keeps advancing.
           if(boundaryIndex<lastBoundaryIndex && !(boundaryElapsed>=0&&boundaryElapsed>lastBoundaryElapsed+0.08))return;
