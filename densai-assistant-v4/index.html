@@ -349,11 +349,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  let speechToken=0, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
+  let speechToken=0, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, speechEndTimer=null, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
   function clearSpeechMotion(){
     clearTimeout(speechBeatTimer);speechBeatTimer=null;
     clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
     clearTimeout(speechStartTimer);speechStartTimer=null;
+    clearTimeout(speechEndTimer);speechEndTimer=null;
     character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if('speechSynthesis' in window)try{speechSynthesis.cancel()}catch(e){}}
@@ -376,16 +377,27 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
        // Voices may load later, so resolve them afresh for each utterance.
        try{const ruVoice=speechSynthesis.getVoices?.().find(v=>/^ru(?:[-_]|$)/i.test(v.lang||''));if(ruVoice)u.voice=ruVoice}catch(e){/* Keep browser language fallback if voice enumeration fails. */}
       let speechPaused=false;
-      u.onstart=()=>{if(token===speechToken&&!speechPaused&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){clearTimeout(speechStartTimer);speechStartTimer=null;character.classList.add('ds-speaking')}};
+      // A voice can start but never fire onend/error. Bound the active animation
+      // without disabling the sound toggle for subsequent replies.
+      const keepSpeechAlive=()=>{
+        clearTimeout(speechEndTimer);
+        speechEndTimer=setTimeout(()=>{
+          if(token!==speechToken||speechPaused||muted||document.hidden)return;
+          stopSpeech();
+          hint.textContent='Озвучка остановлена: голосовой движок не завершил ответ.';
+        },90000);
+      };
+      u.onstart=()=>{if(token===speechToken&&!speechPaused&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){clearTimeout(speechStartTimer);speechStartTimer=null;character.classList.add('ds-speaking');keepSpeechAlive()}};
       // Browser speech may pause without ending; freeze the rig until the voice resumes.
       u.onpause=()=>{if(token===speechToken){speechPaused=true;clearSpeechMotion()}};
-      u.onresume=()=>{if(token===speechToken&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){speechPaused=false;character.classList.add('ds-speaking')}};
+      u.onresume=()=>{if(token===speechToken&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){speechPaused=false;character.classList.add('ds-speaking');keepSpeechAlive()}};
       // Word boundaries are emitted by some browser voices, but not all.
       u.onboundary=(event)=>{
         if(token!==speechToken||speechPaused||muted||root.dataset.minimized==='true'||document.hidden||motionPreference.matches||(event.name&&event.name!=='word'))return;
         // Some speech engines emit word boundaries before onstart: accept them as speech evidence.
         clearTimeout(speechStartTimer);speechStartTimer=null;
         if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
+        keepSpeechAlive();
         const now=performance.now();
         // Some voices report charIndex=0 for every word. Distinguish new words by
         // advancing speech elapsedTime, while rejecting duplicate or older events.
@@ -439,7 +451,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       speechStartTimer=setTimeout(()=>{
         if(token!==speechToken||muted||document.hidden)return;
         if(speechSynthesis.paused)return;
-        if(speechSynthesis.speaking){character.classList.add('ds-speaking');return;}
+        if(speechSynthesis.speaking){character.classList.add('ds-speaking');keepSpeechAlive();return;}
         stopSpeech();reportSpeechFailure();
       },12000);
       speechSynthesis.speak(u);
