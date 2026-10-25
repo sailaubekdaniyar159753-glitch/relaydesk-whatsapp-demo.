@@ -310,6 +310,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(/портфоли|(?:^|[^\p{L}])демо(?=$|[^\p{L}])|пример(?:ы|ов|а)?\s+(?:ваших?|работ|проект|сайт|бот|игр|видео|ролик)|(?:покаж(?:и|ите)|посмотр(?:еть|ю))[^.!?]{0,50}(?:пример|работы|портфоли|демо)/iu.test(q))return 'portfolio';
     const personalContactRequest=/(?:как|где|можно)\s+(?:с\s+вами\s+)?связаться|связаться\s+с\s+вами|куда\s+(?:мне\s+)?написать|как\s+(?:вам|тебе|с\s+вами)\s+написать|(?:ваш|ваши|вашего)\s+(?:телеграм|telegram|номер|телефон|контакт)|контакт(?:ы)?\s+(?:для\s+(?:заказа|связи)|densai|студии)|(?:дайте|скиньте|пришлите)\s+(?:ваши\s+)?контакт/iu.test(q);
     if((!siteIntent||personalContactRequest)&&/(?:^|[^\p{L}])контакт(?:ы|ов|ам|ами|ах)?(?=$|[^\p{L}])|контактн(?:ые|ую|ой)\s+данн(?:ые|ых)|(?:как|где|можно)\s+(?:с\s+вами\s+)?связаться|связаться\s+с\s+вами|куда\s+(?:мне\s+)?написать|как\s+(?:вам|тебе|с\s+вами)\s+написать|(?:ваш|ваши|вашего)\s+(?:телеграм|telegram|номер|телефон)|телефон/iu.test(q))return 'contact';
+    // A banner or video FOR a website is a media deliverable, not a website order.
+    // A website WITH a banner or video still follows the website route.
+    if(siteIntent && /(?:баннер\p{L}*|обложк\p{L}*|логотип\p{L}*|превью|карточк\p{L}*|дизайн\p{L}*|изображен\p{L}*|фото\p{L}*)\s+(?:для|на|под)\s+(?:(?:мой|моего|мою|наш|нашего|нашу|свой|своего|свою|этот|этого|эту)\s+)?(?:сайт\p{L}*|лендинг\p{L}*|(?:веб[-\s]?)?страниц\p{L}*)/iu.test(q))return 'design';
+    if(siteIntent && /(?:видео|ролик\p{L}*|монтаж|reels|shorts|озвучк\p{L}*|анимаци\p{L}*)\s+(?:для|на|под)\s+(?:(?:мой|моего|мою|наш|нашего|нашу|свой|своего|свою|этот|этого|эту)\s+)?(?:сайт\p{L}*|лендинг\p{L}*|(?:веб[-\s]?)?страниц\p{L}*)/iu.test(q))return 'video';
     // Recording a video is media production, not appointment-booking automation.
     if(!explicitBot && /запис/iu.test(q) && /(видео|ролик|монтаж|подкаст|экран|озвучк|reels|shorts|youtube|ютуб)/iu.test(q) && !/(клиент|заявк|при[её]м|брон|crm|автоматиз)/iu.test(q))return 'video';
     // A site or landing page FOR a game is a website brief, not game development.
