@@ -317,7 +317,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // A banner or video FOR a website is a media deliverable, not a website order.
     // A website WITH a banner or video still follows the website route.
     if(siteIntent && /(?:баннер\p{L}*|обложк\p{L}*|логотип\p{L}*|превью|карточк\p{L}*|дизайн\p{L}*(?:\s+(?:карточ|баннер|обложк)\p{L}*)?|изображен\p{L}*|фото\p{L}*)\s+(?:для|на|под)\s+(?:(?:мой|моего|мою|наш|нашего|нашу|свой|своего|свою|этот|этого|эту)\s+)?(?:сайт\p{L}*|лендинг\p{L}*|(?:веб[-\s]?)?страниц\p{L}*|интернет[-\s]?магазин\p{L}*)/iu.test(q))return 'design';
-    if(siteIntent && /(?:видео|ролик\p{L}*|монтаж|reels|shorts|озвучк\p{L}*|анимаци\p{L}*)\s+(?:для|на|под|о|об|про)\s+(?:(?:мой|моего|мою|мо[её]м|наш|нашего|нашу|нашем|свой|своего|свою|сво[её]м|этот|этого|эту|собственн\p{L}*)\s+)?(?:сайт\p{L}*|лендинг\p{L}*|(?:веб[-\s]?)?страниц\p{L}*|интернет[-\s]?магазин\p{L}*)/iu.test(q))return 'video';
+    if(siteIntent && /(?:видео|ролик\p{L}*|монтаж|reels|shorts|озвучк\p{L}*|анимаци\p{L}*)\s+(?:для|на|под|о|об|про)\s+(?:(?:мой|моего|мою|мо[её]м|наш|нашего|нашу|нашем|свой|своего|свою|сво[её]м|этот|этого|эту|этом|собственн\p{L}*)\s+)?(?:сайт\p{L}*|лендинг\p{L}*|(?:веб[-\s]?)?страниц\p{L}*|интернет[-\s]?магазин\p{L}*)/iu.test(q))return 'video';
     // Recording a video is media production, not appointment-booking automation.
     if(!explicitBot && /запис/iu.test(q) && /(видео|ролик|монтаж|подкаст|экран|озвучк|reels|shorts|youtube|ютуб)/iu.test(q) && !/(клиент|заявк|при[её]м|брон|crm|автоматиз)/iu.test(q))return 'video';
     // A site or landing page FOR a game is a website brief, not game development.
