@@ -404,7 +404,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         const boundaryIndex=Number.isFinite(event.charIndex)?event.charIndex:-1;
         const boundaryElapsed=Number.isFinite(event.elapsedTime)?event.elapsedTime:-1;
         if(boundaryIndex>=0){
-          if(boundaryIndex<lastBoundaryIndex)return;
+          // Some engines restart charIndex at each sentence while elapsedTime keeps advancing.
+          if(boundaryIndex<lastBoundaryIndex && !(boundaryElapsed>=0&&boundaryElapsed>lastBoundaryElapsed+0.08))return;
           // Some engines freeze both offsets at zero. Accept later word events
           // by wall-clock spacing, but still reject immediate duplicates.
           const elapsedAdvanced=boundaryElapsed>=0&&boundaryElapsed>lastBoundaryElapsed+0.08;
