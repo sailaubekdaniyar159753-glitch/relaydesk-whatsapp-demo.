@@ -195,7 +195,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   const hint=make('div','ds-hint','Привет! 👋 Тыкни на меня!');hint.setAttribute('aria-live','polite');
   const character=make('button','ds-person ds-idle');character.type='button';character.setAttribute('aria-label','Нажать на мультяшного DenSai');
   const motionPreference=window.matchMedia('(prefers-reduced-motion: reduce)');
-  const mascotFrame=()=>motionPreference.matches?assets.poster:assets.idle;
+  const mascotFrame=()=>motionPreference.matches||document.hidden?assets.poster:assets.idle;
   const rig=make('span','ds-rig');
   const base=make('img','ds-base');base.alt='Мультяшный DenSai в пушистой куртке';base.src=mascotFrame();base.loading='eager';base.decoding='async';
   const headLayer=make('img','ds-head-layer');headLayer.alt='';headLayer.src=mascotFrame();headLayer.loading='eager';headLayer.decoding='async';
@@ -537,7 +537,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     reset();
     hint.textContent='Привет! 👋 Тыкни на меня!';
   }
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendAnimations()});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)suspendAnimations();refreshMotionFrames()});
   window.addEventListener('pagehide',suspendAnimations);
   const addToDom=()=>document.body.appendChild(root);
   if(document.body)addToDom();else document.addEventListener('DOMContentLoaded',addToDom,{once:true});
