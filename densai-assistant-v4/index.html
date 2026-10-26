@@ -309,6 +309,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const featureNotEstimate=(featureBrief||paymentAsFeature||paymentIntegrationBrief)&&!asksTime&&!asksPrice;
     const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // Channel branding and standalone visual assets are design, even when the client
+    // mentions Telegram, Twitch or a video platform as the destination.
+    // Explicit website/chatbot builds and video production still keep their routes.
+    if(!siteIntent&&!explicitBot &&
+       /(?:аватарк?\p{L}*|иконк\p{L}*|шапк\p{L}*|баннер\p{L}*|обложк\p{L}*|превью|логотип\p{L}*|постер\p{L}*|карточк\p{L}*|(?:оформлени\p{L}*|оформ\p{L}*)\s+(?:(?:для|моего|нашего)\s+){0,2}(?:канал\p{L}*|стрим\p{L}*|youtube|ютуб|twitch|твич|соцсет\p{L}*))/iu.test(q) &&
+       !/(?:монтаж|монтир|смонтир|съ[её]мк|снять|сними|озвучк|запис\p{L}*\s+(?:видео|ролик)|(?:созда\p{L}*|сдела\p{L}*)\s+(?:(?:коротк|рекламн|нов)\p{L}*\s+){0,2}(?:видео|ролик))/iu.test(q))return 'design';
     // A visual mockup of checkout controls is a design request, not implementation.
     if(siteIntent&&/(?:дизайн|макет|нарисов|отрисов)\p{L}*\s+(?:кнопк\p{L}*|форм\p{L}*)\s+(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*/iu.test(q))return 'design';
     // Asking to SEE an example is not an order to BUILD the example.
