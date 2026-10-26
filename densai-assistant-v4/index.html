@@ -411,8 +411,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           hint.textContent='Озвучка остановлена: голосовой движок слишком долго был на паузе.';
         },90000);
       }};
-      u.onresume=()=>{if(token===speechToken&&speechPaused&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){
-        speechPaused=false;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
+      u.onresume=()=>{if(token===speechToken&&(speechPaused||(!speechStarted&&speechPauseTimer&&speechSynthesis.speaking&&!speechSynthesis.paused))&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){
+        speechStarted=true;speechPaused=false;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
         character.classList.add('ds-speaking');keepSpeechAlive();
       }};
       // Word boundaries are emitted by some browser voices, but not all.
