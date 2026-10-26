@@ -321,7 +321,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(/(?:^|[\s,.!?])(?:пример(?:ы|ов|а)?|покажи(?:те)?|посмотр(?:еть|ю))\s+(?:(?:ваш(?:их|и)?|готов(?:ых|ые)?|работ(?:ы|у)?)\s+){0,3}(?:сайт(?:а|ов|ы)?|лендинг(?:а|ов|и)?|чат[-\s]?бот(?:а|ов|ы)?|работ(?:ы|у)?|портфолио)(?=$|[^\p{L}])/iu.test(q))return 'portfolio';
     // A site WITH an embedded chatbot is a website brief; a chatbot FOR a site is a bot brief.
     // Do not override price/time questions or independent chatbot requests.
-    if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*\s+(?:с|со)\s+(?:(?:встроенн\p{L}*|интегрированн\p{L}*|умн\p{L}*|ai|ии)\s+){0,2}(?:чат[-\s]?бот\p{L}*|(?:(?:telegram|телеграм|whatsapp|ватсап)[-\s]?)?бот\p{L}*)/iu.test(q))return 'sites';
+    if(siteIntent && /(?:сайт|лендинг|веб[-\s]?страниц)[\p{L}-]*\s+(?:с|со)\s+(?:(?:встроенн\p{L}*|интегрированн\p{L}*|интеграци\p{L}*|подключени\p{L}*|умн\p{L}*|ai|ии)\s+){0,2}(?:чат[-\s]?бот\p{L}*|(?:(?:telegram|телеграм|whatsapp|ватсап)[-\s]?)?бот\p{L}*)/iu.test(q))return 'sites';
     // Distinguish a website WITH a game from a game or chatbot made FOR a website.
     // The requested deliverable matters more than incidental mentions of a game.
     if(explicitBot&&/(?:^|\s)(?:чат[-\s]?бот|бот)\s+(?:для|на)\s+(?:сайт|лендинг)/iu.test(q))return 'bots';
