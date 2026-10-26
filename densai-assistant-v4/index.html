@@ -496,7 +496,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           },90000);
           return;
         }
-        if(speechSynthesis.speaking){character.classList.add('ds-speaking');keepSpeechAlive();return;}
+        if(speechSynthesis.speaking){speechStarted=true;character.classList.add('ds-speaking');keepSpeechAlive();return;}
         stopSpeech();reportSpeechFailure();
       },12000);
       speechOwnsUtterance=true;
