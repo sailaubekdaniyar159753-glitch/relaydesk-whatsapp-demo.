@@ -394,7 +394,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // Browser speech may pause without ending; freeze the rig until the voice resumes.
       // Some voices pause without ever resuming or ending. Avoid an orphaned
       // utterance holding the sound control in an apparently active state.
-      u.onpause=()=>{if(token===speechToken&&!speechPaused){
+      u.onpause=()=>{if(token===speechToken&&speechStarted&&!speechPaused){
         speechPaused=true;clearSpeechMotion();
         speechPauseTimer=setTimeout(()=>{
           if(token!==speechToken||!speechPaused||muted||document.hidden)return;
