@@ -439,6 +439,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           lastBoundaryIndex=boundaryIndex;
           lastBoundaryWall=now;
         }
+        // A valid boundary can precede onstart on some speech engines.
+        // Mark playback as started so an ensuing onpause can freeze the character.
+        if(!speechStarted&&speechSynthesis.speaking)speechStarted=true;
         // Only accepted word events confirm speech activity and extend the watchdog.
         // Rejected duplicates/stale events must not cancel the startup check.
         if(speechProgress){clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;keepSpeechAlive();}
