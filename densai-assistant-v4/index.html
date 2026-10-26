@@ -334,6 +334,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Messenger/CRM is often just the delivery channel for a video or design job.
     // Keep explicit chatbot requests and website requests on their existing routes.
     if(!explicitBot && !siteIntent){
+      // Channel headers and banners are graphic design, even when a video platform is mentioned.
+      if((/(?:баннер\p{L}*|шапк\p{L}*)\s+(?:для|на|под)\s+(?:(?:моего|нашего|youtube|ютуб)\s+){0,2}(?:видео|ролик|канал|ютуб|youtube)/iu.test(q) ||
+          /оформ\p{L}*\s+(?:(?:мой|наш|youtube|ютуб)\s+){0,2}канал\p{L}*/iu.test(q)) &&
+          !/(?:монтаж|монтир|смонтир|съ[её]мк|снять|сними|озвучк|запис\p{L}*\s+(?:видео|ролик))/iu.test(q))return 'design';
       // A cover or thumbnail FOR a video is design; explicit video production remains video.
       if(/(?:обложк\p{L}*|превью|thumbnail\p{L}*)\s+(?:для|на|под)\s+(?:(?:моего|моих|нашего|нового|этого|youtube|ютуб)\s+){0,2}(?:видео\p{L}*|ролик\p{L}*|shorts|reels|ютуб\p{L}*|youtube|тикток|tiktok)/iu.test(q) && !/(?:монтаж|монтир|смонтир|съ[её]мк|снять|сними|озвучк|сдела\p{L}*\s+(?:(?:коротк|рекламн|нов)\p{L}*\s+){0,2}(?:видео|ролик))/iu.test(q))return 'design';
       if(/видео|монтаж|монтир|ролик|вебинар|веб[-\s]?камер|reels|shorts|тикток|tiktok|озвучк/i.test(q))return 'video';
