@@ -372,7 +372,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   function say(s){
     if(muted||root.dataset.minimized==='true'||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
     // Speech synthesis is shared by the whole page: do not queue behind another component's voice.
-    if(!speechOwnsUtterance&&speechSynthesis.speaking){hint.textContent='В браузере уже идёт озвучка. Попробуй ещё раз позже 🔊';return;}
+    if(!speechOwnsUtterance&&(speechSynthesis.speaking||speechSynthesis.pending)){hint.textContent='В браузере уже идёт или ожидает озвучка. Попробуй ещё раз позже 🔊';return;}
     stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;wordBoundaryCount=0;lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;const token=speechToken;
     try{
       const spoken=s.replace(/https?:\/\/[^\s]+/gi,'ссылка есть в чате').replace(/[^\p{L}\p{N}\s!?,.:;\-]/gu,'').replace(/\s+/g,' ').replace(/\s+\./g,'.').trim();
