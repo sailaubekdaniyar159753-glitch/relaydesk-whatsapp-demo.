@@ -394,7 +394,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     hint.textContent='Озвучка недоступна. Попробуй ещё раз 🔇';
   }
   function say(s){
-    if(muted||root.dataset.minimized==='true'||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
+    if(muted||document.hidden||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
     // Speech synthesis is shared by the whole page: do not queue behind another component's voice.
     if(!speechOwnsUtterance&&(speechSynthesis.speaking||speechSynthesis.pending)){hint.textContent='В браузере уже идёт или ожидает озвучка. Попробуй ещё раз позже 🔊';return;}
     stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;wordBoundaryCount=0;lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;const token=speechToken;
@@ -416,7 +416,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         },90000);
       };
       // Some voices fire onstart while the shared synthesizer is paused; do not animate until resume.
-      u.onstart=()=>{if(token===speechToken&&!speechStarted&&!speechPaused&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){speechStarted=true;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;if(speechSynthesis.paused){u.onpause();return;}character.classList.add('ds-speaking');keepSpeechAlive()}};
+      u.onstart=()=>{if(token===speechToken&&!speechStarted&&!speechPaused&&!muted&&!document.hidden){speechStarted=true;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;if(speechSynthesis.paused){u.onpause();return;}if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive()}};
       // Browser speech may pause without ending; freeze the rig until the voice resumes.
       // Some voices pause without ever resuming or ending. Avoid an orphaned
       // utterance holding the sound control in an apparently active state.
@@ -428,16 +428,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           hint.textContent='Озвучка остановлена: голосовой движок слишком долго был на паузе.';
         },90000);
       }};
-      u.onresume=()=>{if(token===speechToken&&(!speechSynthesis.paused&&(speechPaused||(!speechStarted&&speechSynthesis.speaking)))&&!muted&&root.dataset.minimized!=='true'&&!document.hidden){
+      u.onresume=()=>{if(token===speechToken&&(!speechSynthesis.paused&&(speechPaused||(!speechStarted&&speechSynthesis.speaking)))&&!muted&&!document.hidden){
         // Some engines restart word offsets and elapsedTime after a real pause.
         // Reset the boundary baseline so resumed speech can articulate immediately.
         if(speechPaused){lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;lastWordBeat=-Infinity;}
         speechStarted=true;speechPaused=false;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
-        character.classList.add('ds-speaking');keepSpeechAlive();
+        if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive();
       }};
       // Word boundaries are emitted by some browser voices, but not all.
       u.onboundary=(event)=>{
-        if(token!==speechToken||speechPaused||muted||root.dataset.minimized==='true'||document.hidden||speechSynthesis.paused||(!speechStarted&&!speechSynthesis.speaking)||(event.name&&event.name!=='word'))return;
+        if(token!==speechToken||speechPaused||muted||document.hidden||speechSynthesis.paused||(!speechStarted&&!speechSynthesis.speaking)||(event.name&&event.name!=='word'))return;
         const now=performance.now();
         // Some voices report charIndex=0 for every word. Distinguish new words by
         // advancing speech elapsedTime, while rejecting duplicate or older events.
@@ -474,11 +474,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Only accepted word events confirm speech activity and extend the watchdog.
         // Rejected duplicates/stale events must not cancel the startup check.
         if(speechProgress){clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;keepSpeechAlive();}
-        if(!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
+        if(root.dataset.minimized!=='true'&&!character.classList.contains('ds-speaking'))character.classList.add('ds-speaking');
         // Remember throttled words too; missing offsets still use timed gestures.
         if(boundaryElapsed>=0)lastBoundaryElapsed=boundaryElapsed;
         // Reduced-motion users still need speech activity tracking, without visual gestures.
-        if(motionPreference.matches)return;
+        if(motionPreference.matches||root.dataset.minimized==='true')return;
         // Every fresh word extends the inactivity window, even if its gesture is throttled.
         clearTimeout(speechFallbackTimer);
         speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse')},700);
@@ -524,7 +524,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           },90000);
           return;
         }
-        if(speechSynthesis.speaking){speechStarted=true;character.classList.add('ds-speaking');keepSpeechAlive();return;}
+        if(speechSynthesis.speaking){speechStarted=true;if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive();return;}
         stopSpeech();reportSpeechFailure();
       },12000);
       speechOwnsUtterance=true;
