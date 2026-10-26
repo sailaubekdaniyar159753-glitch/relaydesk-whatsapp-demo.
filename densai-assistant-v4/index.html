@@ -304,7 +304,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       /(?:подключ|настро|интегрир|добав|встро)\p{L}*\s+(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*/iu.test(q)||
       /(?:нуж\p{L}*|хочу|сдела\p{L}*|разработа\p{L}*)[^.!?]{0,100}(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*\s+(?:через|по)\s+(?:kaspi|каспи|карт\p{L}*|qr)/iu.test(q));
     const featureNotEstimate=(featureBrief||paymentAsFeature||paymentIntegrationBrief)&&!asksTime&&!asksPrice;
-    const priority=asksTime?'time':asksPrice?'price':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
+    const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
     // A visual mockup of checkout controls is a design request, not implementation.
     if(siteIntent&&/(?:дизайн|макет|нарисов|отрисов)\p{L}*\s+(?:кнопк\p{L}*|форм\p{L}*)\s+(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*/iu.test(q))return 'design';
