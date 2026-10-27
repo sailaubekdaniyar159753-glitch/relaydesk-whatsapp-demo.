@@ -257,9 +257,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // A message sent by the visitor should still reveal the newest exchange.
     const followLatest=who==='guest'||conversation.scrollHeight-conversation.scrollTop-conversation.clientHeight<48;
     conversation.appendChild(el);
+    // Preserve the reader's place when old messages are pruned, even if the
+    // browser does not provide native scroll anchoring. Measure the actual
+    // element position to avoid double-adjusting in browsers that do.
+    const scrollAnchor=!followLatest&&conversation.scrollTop>0&&conversation.children.length>80
+      ?conversation.children[1]:null;
+    const anchorTop=scrollAnchor?.getBoundingClientRect().top;
     // Keep long sessions responsive without retaining an unbounded DOM history.
     while(conversation.children.length>80)conversation.removeChild(conversation.firstElementChild);
     if(followLatest)conversation.scrollTop=conversation.scrollHeight;
+    else if(scrollAnchor?.isConnected)conversation.scrollTop+=scrollAnchor.getBoundingClientRect().top-anchorTop;
     return el;
   }
   const text={
