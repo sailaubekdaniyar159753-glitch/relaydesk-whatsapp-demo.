@@ -418,7 +418,18 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         },90000);
       };
       // Some voices fire onstart while the shared synthesizer is paused; do not animate until resume.
-      u.onstart=()=>{if(token===speechToken&&!speechStarted&&!speechPaused&&!muted&&!document.hidden){speechStarted=true;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;if(speechSynthesis.paused){u.onpause();return;}if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive()}};
+      // onstart may arrive before the browser marks audio as speaking.
+      // Do not animate silently; keep the startup watchdog until playback is confirmed.
+      u.onstart=()=>{
+        if(token!==speechToken||speechStarted||speechPaused||muted||document.hidden)return;
+        if(speechSynthesis.paused){speechStarted=true;u.onpause();return;}
+        const activate=()=>{
+          if(token!==speechToken||speechStarted||speechPaused||muted||document.hidden||speechSynthesis.paused||!speechSynthesis.speaking)return;
+          speechStarted=true;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
+          if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive();
+        };
+        if(speechSynthesis.speaking)activate();else setTimeout(activate,120);
+      };
       // Browser speech may pause without ending; freeze the rig until the voice resumes.
       // Some voices pause without ever resuming or ending. Avoid an orphaned
       // utterance holding the sound control in an apparently active state.
