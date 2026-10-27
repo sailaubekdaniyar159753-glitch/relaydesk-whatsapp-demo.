@@ -443,7 +443,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       };
       // Word boundaries are emitted by some browser voices, but not all.
       u.onboundary=(event)=>{
-        if(token!==speechToken||speechPaused||muted||document.hidden||speechSynthesis.paused||(!speechStarted&&!speechSynthesis.speaking)||(event.name&&event.name!=='word'))return;
+        if(token!==speechToken||speechPaused||muted||document.hidden||speechSynthesis.paused||!speechSynthesis.speaking||(event.name&&event.name!=='word'))return;
         const now=performance.now();
         // Some voices report charIndex=0 for every word. Distinguish new words by
         // advancing speech elapsedTime, while rejecting duplicate or older events.
