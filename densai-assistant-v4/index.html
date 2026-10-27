@@ -321,6 +321,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const featureNotEstimate=(featureBrief||paymentAsFeature||paymentIntegrationBrief)&&!asksTime&&!asksPrice;
     const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // Animating an existing character is a mascot/assistant request, even for a site.
+    // Game, video, illustration and full-site briefs keep their own categories.
+    const animatedCharacter=/(?:анимир\p{L}*|анимаци\p{L}*|ожив\p{L}*|артикуляц\p{L}*|липсинк\p{L}*|lip[-\s]?sync|морга\p{L}*|двига\p{L}*|мимик\p{L}*)/iu.test(q) &&
+      /(?:персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*|деревянн\p{L}*\s+мальчик\p{L}*)/iu.test(q);
+    if(animatedCharacter){
+      if(/(?:roblox|роблокс|игр|гейм|квиз|arcade)/iu.test(q))return 'games';
+      if(/(?:видео|ролик|мультфильм|фильм|клип|shorts|reels|монтаж)/iu.test(q))return 'video';
+      if(/(?:рисов|отрисов|концепт|дизайн)/iu.test(q))return 'design';
+      if(!(siteIntent&&/(?:сайт|лендинг)\p{L}*\s+(?:с|со)\s+(?:анимир\p{L}*|говорящ\p{L}*|интерактивн\p{L}*|персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)/iu.test(q)))return 'bots';
+    }
     // Standalone talking mascots are interactive assistants, not generic design assets.
     // Keep character art, game characters, video characters and full sites in their own routes.
     const standaloneMascot=/(?:(?:3d|2d)[-\s]+)?(?:интерактивн\p{L}*|говорящ\p{L}*|разговаривающ\p{L}*|общающ\p{L}*)\s+(?:(?:3d|2d|веб)[-\s]?)?(?:персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)/iu.test(q);
