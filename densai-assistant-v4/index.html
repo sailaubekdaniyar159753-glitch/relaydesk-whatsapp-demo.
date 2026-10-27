@@ -260,7 +260,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   }
   const text={
     games:'🎮 Разрабатываем небольшие HTML5/JavaScript мини-игры, квизы и 2D-прототипы. Пример готовой игры — NEON HUNT: https://densai-neon-hunt.vercel.app/',
-    bots:'🤖 Есть прототипы веб-консультантов и Telegram-ботов для FAQ, записи и сбора заявок. Полноценные подключения к Telegram, CRM и оплате делаются только после согласования ТЗ и интеграций.',
+    bots:'🤖 Есть тестовый интерактивный персонаж DenSai с браузерной речью, а также прототипы веб-консультантов и Telegram-ботов для FAQ, записи и сбора заявок. Полноценные подключения к Telegram, CRM и оплате делаются только после согласования ТЗ и интеграций.',
     sites:'🌐 Делаем адаптивные сайты-визитки, небольшие сайты и лендинги. Опишите задачу, структуру и пожелания — согласуем объём.',
     design:'🎨 Дизайн рекламных баннеров, карточек товаров, обложек, визуалов для соцсетей и AI-изображений.',
     video:'🎬 Монтаж готовых видео, коротких Reels/Shorts, рекламных материалов и AI-визуалов. Уточните длительность, количество роликов и референс.',
@@ -320,6 +320,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(siteIntent&&/(?:дизайн|макет|нарисов|отрисов)\p{L}*\s+(?:кнопк\p{L}*|форм\p{L}*)\s+(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*/iu.test(q))return 'design';
     // Asking to SEE an example is not an order to BUILD the example.
     if(/(?:^|[\s,.!?])(?:пример(?:ы|ов|а)?|покажи(?:те)?|посмотр(?:еть|ю))\s+(?:(?:ваш(?:их|и)?|готов(?:ых|ые)?|работ(?:ы|у)?)\s+){0,3}(?:сайт(?:а|ов|ы)?|лендинг(?:а|ов|и)?|чат[-\s]?бот(?:а|ов|ы)?|работ(?:ы|у)?|портфолио)(?=$|[^\p{L}])/iu.test(q))return 'portfolio';
+    // An interactive or talking mascot FOR a site is an assistant, not a full website build.
+    // A website WITH such a mascot remains a website request.
+    if(siteIntent && /(?:интерактивн\p{L}*|говорящ\p{L}*|общающ\p{L}*|разговаривающ\p{L}*)\s+(?:(?:3d|2d|веб)[-\s]?)?(?:персонаж\p{L}*|аватар\p{L}*|маскот\p{L}*)\s+(?:для|на)\s+(?:(?:моего|нашего|своего|этого)\s+)?(?:сайт\p{L}*|лендинг\p{L}*)/iu.test(q))return 'bots';
     // An AI assistant FOR a site is a chatbot deliverable, not a request to build the site.
     if(siteIntent && /(?:чат\s+с\s+(?:ии|ai)|(?:ии|ai)[-\s]?(?:чат|ассистент|помощник|консультант)\p{L}*|(?:виртуальн\p{L}*|умн\p{L}*|голосов\p{L}*)\s+(?:ассистент|помощник|консультант)\p{L}*|(?:ассистент|помощник|консультант)\p{L}*)\s+(?:для|на)\s+(?:(?:моего|нашего|своего|этого)\s+)?(?:сайт\p{L}*|лендинг\p{L}*)/iu.test(q))return 'bots';
     // A site WITH an embedded chatbot is a website brief; a chatbot FOR a site is a bot brief.
