@@ -484,13 +484,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         }else if(speechSynthesis.speaking){
           clearTimeout(speechPauseTimer);speechPauseTimer=null;
           speechInactiveChecks=0;
+          // A queued voice can resume without onstart/onresume after the startup watchdog.
+          if(!speechStarted)resumeSpeech();
           if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');
         }else if(++speechInactiveChecks>=3){
           stopSpeech();
           hint.textContent='Озвучка завершилась без сигнала браузера.';
           return;
         }
-        speechHealthTimer=setTimeout(checkSpeechHealth,1500);
+        // resumeSpeech may already have scheduled the next health check.
+        if(!speechHealthTimer)speechHealthTimer=setTimeout(checkSpeechHealth,1500);
       };
       const keepSpeechAlive=()=>{
         if(!speechHealthTimer)speechHealthTimer=setTimeout(checkSpeechHealth,1500);
@@ -633,6 +636,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
             stopSpeech();
             hint.textContent='Озвучка остановлена: голосовой движок не начал ответ после паузы.';
           },90000);
+          // Poll for an engine that silently resumes without firing speech events.
+          if(!speechHealthTimer)speechHealthTimer=setTimeout(checkSpeechHealth,1500);
           return;
         }
         if(speechSynthesis.speaking){speechStarted=true;if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive();return;}
