@@ -331,6 +331,14 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       if(/(?:рисов|отрисов|концепт|дизайн)/iu.test(q))return 'design';
       if(!(siteIntent&&/(?:сайт|лендинг)\p{L}*\s+(?:с|со)\s+(?:анимир\p{L}*|говорящ\p{L}*|интерактивн\p{L}*|персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)/iu.test(q)))return 'bots';
     }
+    // Artwork of a character for a site is design, not a request to build the site.
+    // Keep complete sites and animated/lip-synced mascots in their own routes.
+    if(siteIntent &&
+       /(?:нарис\p{L}*|отрис\p{L}*|иллюстраци\p{L}*|концепт\p{L}*|дизайн\p{L}*|картинк\p{L}*)/iu.test(q) &&
+       /(?:персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*|деревянн\p{L}*\s+мальчик\p{L}*)/iu.test(q) &&
+       !animatedCharacter &&
+       !/(?:созд|разработ|сдела|нуж|закаж|хочу)\p{L}*\s+(?:(?:нов\p{L}*|адаптивн\p{L}*|полноценн\p{L}*)\s+){0,2}(?:сайт|лендинг)/iu.test(q) &&
+       !/(?:сайт|лендинг)\p{L}*\s+(?:с|со)\s+/iu.test(q))return 'design';
     // Standalone talking mascots are interactive assistants, not generic design assets.
     // Keep character art, game characters, video characters and full sites in their own routes.
     const standaloneMascot=/(?:(?:3d|2d)[-\s]+)?(?:интерактивн\p{L}*|говорящ\p{L}*|разговаривающ\p{L}*|общающ\p{L}*)\s+(?:(?:3d|2d|веб)[-\s]?)?(?:персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)/iu.test(q);
