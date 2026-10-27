@@ -458,7 +458,14 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // inactive samples before cancelling, so a brief browser state glitch is safe.
       const checkSpeechHealth=()=>{
         speechHealthTimer=null;
-        if(token!==speechToken||speechPaused||muted||document.hidden)return;
+        if(token!==speechToken||muted||document.hidden)return;
+        // Some engines resume audio without an onresume event. Keep polling
+        // during an explicit pause, but never animate until playback is confirmed.
+        if(speechPaused){
+          if(speechSynthesis.speaking&&!speechSynthesis.paused)resumeSpeech();
+          if(speechPaused)speechHealthTimer=setTimeout(checkSpeechHealth,1500);
+          return;
+        }
         // Some engines pause without firing onpause: freeze gestures immediately.
         // If they also resume without onresume, restore fallback motion on the next sample.
         if(speechSynthesis.paused){
@@ -509,6 +516,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // utterance holding the sound control in an apparently active state.
       u.onpause=()=>{if(token===speechToken&&speechStarted&&!speechPaused){
         speechPaused=true;clearSpeechMotion();
+        speechHealthTimer=setTimeout(checkSpeechHealth,1500);
         speechPauseTimer=setTimeout(()=>{
           if(token!==speechToken||!speechPaused||muted||document.hidden)return;
           stopSpeech();
