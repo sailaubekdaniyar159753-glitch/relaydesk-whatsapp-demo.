@@ -140,10 +140,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 }
 @media(max-width:650px){
 #densai-helper-root .ds-minimize{display:grid;place-items:center;right:0;top:5px;z-index:2;color:#b8d8ec;pointer-events:auto;font-size:15px}
+}
+/* Preserve the minimized state across phone rotation and viewport resizing. */
 #densai-helper-root[data-minimized="true"] .ds-person,#densai-helper-root[data-minimized="true"] .ds-hint{display:none}
 #densai-helper-root[data-minimized="true"] .ds-tools{margin-top:8px}
-#densai-helper-root[data-minimized="true"] .ds-minimize{top:-23px}
-}
+#densai-helper-root[data-minimized="true"] .ds-minimize{display:grid;place-items:center;right:0;top:-23px;z-index:2}
 
 /* Compact landscape / short viewport: keep message field and close button reachable. */
 @media (max-height:420px) {
