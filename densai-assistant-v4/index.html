@@ -428,7 +428,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           hint.textContent='Озвучка остановлена: голосовой движок слишком долго был на паузе.';
         },90000);
       }};
-      u.onresume=()=>{if(token===speechToken&&(!speechSynthesis.paused&&(speechPaused||(!speechStarted&&speechSynthesis.speaking)))&&!muted&&!document.hidden){
+      u.onresume=()=>{if(token===speechToken&&(speechSynthesis.speaking&&!speechSynthesis.paused&&(speechPaused||!speechStarted))&&!muted&&!document.hidden){
         // Some engines restart word offsets and elapsedTime after a real pause.
         // Reset the boundary baseline so resumed speech can articulate immediately.
         if(speechPaused){lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;lastWordBeat=-Infinity;}
