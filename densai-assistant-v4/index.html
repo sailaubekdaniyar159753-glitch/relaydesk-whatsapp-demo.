@@ -428,7 +428,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           speechStarted=true;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
           if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive();
         };
-        if(speechSynthesis.speaking)activate();else setTimeout(activate,120);
+        if(speechSynthesis.speaking)activate();else {let attempts=0;const retry=()=>{if(token!==speechToken||speechStarted||speechPaused||muted||document.hidden||speechSynthesis.paused)return;if(speechSynthesis.speaking)activate();else if(++attempts<10)setTimeout(retry,120);};setTimeout(retry,120);}
       };
       // Browser speech may pause without ending; freeze the rig until the voice resumes.
       // Some voices pause without ever resuming or ending. Avoid an orphaned
