@@ -253,10 +253,14 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       }
       if(cursor<msg.length)el.append(document.createTextNode(msg.slice(cursor)));
     }else el.textContent=msg;
+    // Do not yank the chat away while someone is reading earlier messages.
+    // A message sent by the visitor should still reveal the newest exchange.
+    const followLatest=who==='guest'||conversation.scrollHeight-conversation.scrollTop-conversation.clientHeight<48;
     conversation.appendChild(el);
     // Keep long sessions responsive without retaining an unbounded DOM history.
     while(conversation.children.length>80)conversation.removeChild(conversation.firstElementChild);
-    conversation.scrollTop=conversation.scrollHeight;return el;
+    if(followLatest)conversation.scrollTop=conversation.scrollHeight;
+    return el;
   }
   const text={
     games:'🎮 Разрабатываем небольшие HTML5/JavaScript мини-игры, квизы и 2D-прототипы. Пример готовой игры — NEON HUNT: https://densai-neon-hunt.vercel.app/',
