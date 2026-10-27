@@ -469,6 +469,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Some engines pause without firing onpause: freeze gestures immediately.
         // If they also resume without onresume, restore fallback motion on the next sample.
         if(speechSynthesis.paused){
+          // Route silent engine pauses through the normal pause handler. This also
+          // suspends the active-speech timeout while audio is genuinely paused.
+          if(speechStarted){u.onpause();return;}
           character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse');
           speechInactiveChecks=0;
           // Some engines never fire onpause. Bound the silent pause separately
@@ -519,6 +522,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         speechHealthTimer=setTimeout(checkSpeechHealth,1500);
         speechPauseTimer=setTimeout(()=>{
           if(token!==speechToken||!speechPaused||muted||document.hidden)return;
+          // Resume can occur just before the pause deadline without onresume.
+          if(speechSynthesis.speaking&&!speechSynthesis.paused){resumeSpeech();return;}
           stopSpeech();
           hint.textContent='Озвучка остановлена: голосовой движок слишком долго был на паузе.';
         },90000);
