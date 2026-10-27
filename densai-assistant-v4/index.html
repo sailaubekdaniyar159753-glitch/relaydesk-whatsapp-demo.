@@ -376,13 +376,14 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  let speechToken=0, speechOwnsUtterance=false, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, speechEndTimer=null, speechPauseTimer=null, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
+  let speechToken=0, speechOwnsUtterance=false, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, speechEndTimer=null, speechPauseTimer=null, speechHealthTimer=null, speechInactiveChecks=0, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
   function clearSpeechMotion(){
     clearTimeout(speechBeatTimer);speechBeatTimer=null;
     clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
     clearTimeout(speechStartTimer);speechStartTimer=null;
     clearTimeout(speechEndTimer);speechEndTimer=null;
     clearTimeout(speechPauseTimer);speechPauseTimer=null;
+    clearTimeout(speechHealthTimer);speechHealthTimer=null;speechInactiveChecks=0;
     character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if(speechOwnsUtterance&&'speechSynthesis' in window){speechOwnsUtterance=false;try{speechSynthesis.cancel()}catch(e){}}}
@@ -409,7 +410,22 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       let speechPaused=false, speechStarted=false;
       // A voice can start but never fire onend/error. Bound the active animation
       // without disabling the sound toggle for subsequent replies.
+      // Some speech engines stop without onend/onerror. Require three consecutive
+      // inactive samples before cancelling, so a brief browser state glitch is safe.
+      const checkSpeechHealth=()=>{
+        speechHealthTimer=null;
+        if(token!==speechToken||speechPaused||muted||document.hidden)return;
+        if(!speechSynthesis.speaking&&!speechSynthesis.pending&&!speechSynthesis.paused){
+          if(++speechInactiveChecks>=3){
+            stopSpeech();
+            hint.textContent='Озвучка завершилась без сигнала браузера.';
+            return;
+          }
+        }else speechInactiveChecks=0;
+        speechHealthTimer=setTimeout(checkSpeechHealth,1500);
+      };
       const keepSpeechAlive=()=>{
+        if(!speechHealthTimer)speechHealthTimer=setTimeout(checkSpeechHealth,1500);
         clearTimeout(speechEndTimer);
         speechEndTimer=setTimeout(()=>{
           if(token!==speechToken||speechPaused||muted||document.hidden)return;
