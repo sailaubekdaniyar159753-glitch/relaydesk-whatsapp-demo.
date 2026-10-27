@@ -416,7 +416,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       const checkSpeechHealth=()=>{
         speechHealthTimer=null;
         if(token!==speechToken||speechPaused||muted||document.hidden)return;
-        if(!speechSynthesis.speaking&&!speechSynthesis.pending&&!speechSynthesis.paused){
+        if(!speechSynthesis.speaking&&!speechSynthesis.paused){
           if(++speechInactiveChecks>=3){
             stopSpeech();
             hint.textContent='Озвучка завершилась без сигнала браузера.';
