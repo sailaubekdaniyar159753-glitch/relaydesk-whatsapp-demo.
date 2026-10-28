@@ -336,7 +336,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       /(?:подключ|настро|интегрир|добав|встро)\p{L}*\s+(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*/iu.test(q)||
       /(?:нуж\p{L}*|хочу|сдела\p{L}*|разработа\p{L}*)[^.!?]{0,100}(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*\s+(?:через|по)\s+(?:kaspi|каспи|карт\p{L}*|qr)/iu.test(q));
     const featureNotEstimate=(featureBrief||paymentAsFeature||paymentIntegrationBrief)&&!asksTime&&!asksPrice;
-    const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
+    // "Стоит ли" / "не стоит" asks for advice, not a price, unless another price cue is present.
+    const adviceNotPrice=/(?:^|[^\p{L}])(?:стоит\s+ли|не\s+стоит)(?=$|[^\p{L}])/iu.test(q) && !/(?:цена|стоим|ценник|сколько|оплат|бюджет|прайс|тенге|тг(?:\s|$))/iu.test(q);
+    const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:(!adviceNotPrice&&patterns.find(([key])=>key==='price')[1].test(q))?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
     // A direct price/deadline question takes precedence over the chatbot deliverable.
     if(siteIntent&&/(?:^|[^\p{L}])чат\s+(?:(?:для|на)\s+(?:(?:моего|нашего|своего)\s+)?(?:сайт|лендинг)|на\s+(?:нашем|мо[её]м|этом)\s+сайт\p{L}*)/iu.test(q))return 'bots';
@@ -426,7 +428,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Standalone AI and voice assistants are bot services even without "bot" in the request.
     // Preserve website, design, video, pricing and portfolio overrides above.
     if(!siteIntent && /(?:^|[^\p{L}])(?:ии|ai)[-\s]?(?:бот\p{L}*|чат[-\s]?бот\p{L}*|chatbot|ассистент\p{L}*|помощник\p{L}*|консультант\p{L}*)|(?:голосов\p{L}*|виртуальн\p{L}*|умн\p{L}*)\s+(?:ассистент|помощник|консультант)\p{L}*|(?:^|[^\p{L}])chatbot(?=$|[^\p{L}])|чат\s+с\s+(?:ии|ai)(?=$|[^\p{L}])/iu.test(q))return 'bots';
-    const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&!(featureNotEstimate&&(key==='price'||key==='time'))&&re.test(q));return found?found[0]:'default';
+    const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&!(featureNotEstimate&&(key==='price'||key==='time'))&&!(adviceNotPrice&&key==='price')&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
   function acknowledgeReply(){
