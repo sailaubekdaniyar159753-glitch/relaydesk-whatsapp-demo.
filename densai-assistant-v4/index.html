@@ -87,6 +87,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @keyframes ds-word-nod-tilt{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(1.5deg)}}
 @keyframes ds-word-hand{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(-4deg) translateY(-1px)}}
 @keyframes ds-word-hand-left{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(4deg) translateY(-1px)}}
+/* A restrained speaking mouth uses the ORIGINAL mascot artwork beneath it.
+   Word boundaries drive short openings; unsupported voices use a gentle fallback. */
+#densai-helper-root .ds-mouth{position:absolute;left:50%;top:38.3%;width:7.2%;height:2.6%;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#4c2820 0%,#25120f 75%);transform:translate(-50%,-50%) scaleY(0);opacity:0;transform-origin:center}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-mouth{animation:ds-mouth-talk .38s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-mouth{animation:ds-mouth-talk .27s ease-out 1}
+@keyframes ds-mouth-talk{0%,100%{transform:translate(-50%,-50%) scaleY(0);opacity:0}42%{transform:translate(-50%,-50%) scaleY(1);opacity:.88}72%{transform:translate(-50%,-50%) scaleY(.42);opacity:.65}}
+
 
 
 #densai-helper-root .ds-hit-star{position:absolute;right:2px;top:42px;color:#ffcd5a;opacity:0;font-size:28px;pointer-events:none}
@@ -212,7 +219,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   const refreshMotionFrames=()=>{const frame=mascotFrame();for(const el of [base,headLayer,armLeft,armRight]){if(el.src!==frame)el.src=frame}};
   if(typeof motionPreference.addEventListener==='function')motionPreference.addEventListener('change',refreshMotionFrames);
   else if(typeof motionPreference.addListener==='function')motionPreference.addListener(refreshMotionFrames);
-  rig.append(base,armLeft,armRight,headLayer);
+  const mouth=make('span','ds-mouth');mouth.setAttribute('aria-hidden','true');rig.append(base,armLeft,armRight,headLayer,mouth);
   const star=make('span','ds-hit-star','✦');star.setAttribute('aria-hidden','true');character.append(rig,star);
   const tools=make('div','ds-tools');const open=make('button','ds-open','💬 Спросить DenSai');open.type='button';open.setAttribute('aria-expanded','false');open.setAttribute('aria-controls','densai-dialog');
   const sound=make('button','ds-sound','🔇');sound.type='button';sound.setAttribute('aria-label','Включить звук');sound.setAttribute('aria-pressed','false');sound.title='Включить звук';const voiceSupported=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);if(!voiceSupported){sound.disabled=true;sound.title='Озвучивание недоступно в этом браузере';sound.setAttribute('aria-label',sound.title)}tools.append(open,sound);
