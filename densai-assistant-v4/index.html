@@ -343,6 +343,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(!explicitBot&&!asksPrice&&!asksTime&&/(?:какой|какая|какие|можно|скиньте|пришлите|дайте|отправьте|подскажите)\s+(?:(?:у\s+вас|ваш(?:и|его)?|ваша|мне|свой|свои)\s+)?(?:ссылк\p{L}*\s+(?:на|в)\s+)?(?:телеграм|telegram|whatsapp|ватсап|вацап|тг|номер|контакт\p{L}*)(?=$|[^\p{L}])|(?:ваш|ваша|ваши|твой)\s+(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)(?=$|[^\p{L}])|где\s+(?:вас|тебя|студию)\s+(?:найти|искать)|(?:у\s+вас\s+)?(?:есть|имеется)\s+(?:ли\s+)?(?:у\s+вас\s+)?(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)(?=$|[^\p{L}])|(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)\s+(?:у\s+вас\s+)?(?:есть|имеется)(?=$|[^\p{L}])/iu.test(q))return 'contact';
     const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:(!adviceNotPrice&&patterns.find(([key])=>key==='price')[1].test(q))?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // A request for our own website URL is navigation, not an order to build a website.
+    if(/(?:(?:скин(?:ьте|ь)|пришл(?:ите|и)|дайте|отправ(?:ьте|ь)|можно|подскажите)\s+(?:(?:мне|пожалуйста)\s+)?(?:ссылк\p{L}*|адрес)\s+(?:на\s+)?(?:(?:ваш\p{L}*|наш\p{L}*|студии|densai)\s+){0,3}(?:сайт\p{L}*|лендинг\p{L}*)|какой\s+у\s+вас\s+сайт\p{L}*|где\s+(?:посмотреть|найти|увидеть)\s+(?:ваш\s+)?сайт\p{L}*)/iu.test(q))return 'portfolio';
     // A direct price/deadline question takes precedence over the chatbot deliverable.
     if(siteIntent&&/(?:^|[^\p{L}])чат\s+(?:(?:для|на)\s+(?:(?:моего|нашего|своего)\s+)?(?:сайт|лендинг)|на\s+(?:нашем|мо[её]м|этом)\s+сайт\p{L}*)/iu.test(q))return 'bots';
     // Animating an existing character is a mascot/assistant request, even for a site.
