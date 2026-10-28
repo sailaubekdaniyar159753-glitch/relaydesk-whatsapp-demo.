@@ -47,29 +47,30 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-rig{position:relative;width:100%;height:100%;display:block;transform-origin:50% 92%;will-change:transform}
 #densai-helper-root .ds-base,#densai-helper-root .ds-head-layer,#densai-helper-root .ds-arm{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:bottom;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none;will-change:transform}
 #densai-helper-root .ds-base{z-index:1}
-#densai-helper-root .ds-head-layer{z-index:4;clip-path:ellipse(22% 16% at 50% 18%);transform-origin:50% 28%}
+#densai-helper-root .ds-head-group{position:absolute;inset:0;width:100%;height:100%;z-index:4;transform-origin:50% 28%;pointer-events:none}
+#densai-helper-root .ds-head-layer{z-index:4;clip-path:ellipse(22% 16% at 50% 18%)}
 #densai-helper-root .ds-arm{z-index:3}
 #densai-helper-root .ds-arm-left{clip-path:polygon(0 46%,30% 41%,37% 87%,27% 100%,0 100%);transform-origin:31% 48%}
 #densai-helper-root .ds-arm-right{clip-path:polygon(70% 41%,100% 46%,100% 100%,73% 100%,63% 87%);transform-origin:69% 48%}
 #densai-helper-root .ds-person.ds-hit .ds-rig{animation:ds-recoil .72s cubic-bezier(.2,.9,.2,1)}
-#densai-helper-root .ds-person.ds-hit .ds-head-layer{animation:ds-head-jerk .72s cubic-bezier(.2,.9,.2,1)}
+#densai-helper-root .ds-person.ds-hit .ds-head-group{animation:ds-head-jerk .72s cubic-bezier(.2,.9,.2,1)}
 #densai-helper-root .ds-person.ds-hit .ds-arm-left{animation:ds-arm-left-hit .72s cubic-bezier(.18,.86,.18,1)}
 #densai-helper-root .ds-person.ds-hit .ds-arm-right{animation:ds-arm-right-hit .72s cubic-bezier(.18,.86,.18,1)}
 #densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-rig{animation:ds-float 4.5s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-head-layer{animation:ds-head-breathe 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-head-group{animation:ds-head-breathe 4.5s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-arm-right{animation:ds-arm-idle-right 4.5s ease-in-out infinite}
 
 
 /* A short acknowledgment after a chat reply. Speech and hit animations take priority. */
-#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking) .ds-head-layer{animation:ds-ack-head .68s ease-in-out 1}
+#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking) .ds-head-group{animation:ds-ack-head .68s ease-in-out 1}
 #densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking) .ds-arm-right{animation:ds-ack-hand .68s ease-in-out 1}
 @keyframes ds-ack-head{0%,100%{transform:translate3d(0,0,0) rotate(0)}30%{transform:translate3d(0,1.2px,0) rotate(-1.8deg)}65%{transform:translate3d(0,-.8px,0) rotate(.8deg)}}
 @keyframes ds-ack-hand{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-4deg) translateY(-1.5px)}70%{transform:rotate(1.5deg) translateY(0)}}
 
 /* Speaking motion is driven by actual browser speech start/end events. */
 /* When a voice has no word-boundary events, alternate restrained gestures between hands. */
-#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-head-layer{animation:ds-speech-nod .68s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-head-group{animation:ds-speech-nod .68s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-arm-left{animation:ds-speech-gesture-left 2.6s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-arm-right{animation:ds-speech-gesture 2.6s ease-in-out infinite}
 @keyframes ds-speech-nod{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(1.3px) rotate(-1.4deg)}65%{transform:translateY(-1px) rotate(1.2deg)}}
@@ -77,10 +78,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @keyframes ds-speech-gesture{0%,50%,100%{transform:rotate(0) translateY(0)}64%{transform:rotate(-4deg) translateY(-1.5px)}78%{transform:rotate(1deg) translateY(0)}94%{transform:rotate(0) translateY(0)}}
 /* Prefer small, word-timed motions where speech boundary events are available.
    Browsers without boundary events retain the existing continuous fallback. */
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-head-layer,
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-head-group,
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-arm-right{animation:none}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-layer{animation:ds-word-nod .27s ease-out 1}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-word-tilt:not(.ds-hit) .ds-head-layer{animation:ds-word-nod-tilt .27s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-group{animation:ds-word-nod .27s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-word-tilt:not(.ds-hit) .ds-head-group{animation:ds-word-nod-tilt .27s ease-out 1}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse:not(.ds-hit):not(.ds-word-left) .ds-arm-right{animation:ds-word-hand .3s ease-out 1}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse.ds-word-left:not(.ds-hit) .ds-arm-left{animation:ds-word-hand-left .3s ease-out 1}
 @keyframes ds-word-nod{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(-1.5deg)}}
@@ -220,7 +221,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   const refreshMotionFrames=()=>{const frame=mascotFrame();for(const el of [base,headLayer,armLeft,armRight]){if(el.src!==frame)el.src=frame}};
   if(typeof motionPreference.addEventListener==='function')motionPreference.addEventListener('change',refreshMotionFrames);
   else if(typeof motionPreference.addListener==='function')motionPreference.addListener(refreshMotionFrames);
-  const mouth=make('span','ds-mouth');mouth.setAttribute('aria-hidden','true');rig.append(base,armLeft,armRight,headLayer,mouth);
+  const mouth=make('span','ds-mouth');mouth.setAttribute('aria-hidden','true');const headGroup=make('span','ds-head-group');headGroup.append(headLayer,mouth);rig.append(base,armLeft,armRight,headGroup);
   const star=make('span','ds-hit-star','✦');star.setAttribute('aria-hidden','true');character.append(rig,star);
   const tools=make('div','ds-tools');const open=make('button','ds-open','💬 Спросить DenSai');open.type='button';open.setAttribute('aria-expanded','false');open.setAttribute('aria-controls','densai-dialog');
   const sound=make('button','ds-sound','🔇');sound.type='button';sound.setAttribute('aria-label','Включить звук');sound.setAttribute('aria-pressed','false');sound.title='Включить звук';const voiceSupported=('speechSynthesis' in window)&&('SpeechSynthesisUtterance' in window);if(!voiceSupported){sound.disabled=true;sound.title='Озвучивание недоступно в этом браузере';sound.setAttribute('aria-label',sound.title)}tools.append(open,sound);
