@@ -309,6 +309,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Only an explicit bot/chat request should outrank a site mention.
     const siteIntent=patterns.find(([key])=>key==='sites')[1].test(q);
     const explicitBot=/(?:^|[^\p{L}])бот(?:а|у|е|ом|ы|ов|ам|ами|ах|ик(?:а|и|ов)?)?(?=$|[^\p{L}])|чат[-\s]?бот|(?:создать|разработать|сделать)\s+чат(?:а|е|у|ом)?(?=$|[^\p{L}])/iu.test(q);
+    // Chat requested FOR an existing website is a bot/widget deliverable;
+    // a new site WITH a chat feature remains a website request.
+    if(siteIntent&&/(?:^|[^\p{L}])чат\s+(?:(?:для|на)\s+(?:(?:моего|нашего|своего)\s+)?(?:сайт|лендинг)|на\s+(?:нашем|мо[её]м|этом)\s+сайт\p{L}*)/iu.test(q))return 'bots';
     // Explicit requests for examples or contact details outrank the service mentioned.
     // Keep price/time questions first, including "примерно сколько стоит".
     // Prices, payments and deadlines inside a product brief are features, not estimates.
@@ -337,6 +340,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       if(/(?:рисов|отрисов|концепт|дизайн)/iu.test(q))return 'design';
       if(!(siteIntent&&/(?:сайт|лендинг)\p{L}*\s+(?:с|со)\s+(?:анимир\p{L}*|анимаци\p{L}*|ожив\p{L}*|артикуляц\p{L}*|липсинк\p{L}*|морга\p{L}*|мимик\p{L}*|говорящ\p{L}*|интерактивн\p{L}*|персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)/iu.test(q)))return 'bots';
     }
+    // A character model FOR a site is a design asset; a site WITH one is a site.
+    if(siteIntent&&/(?:3d|2d)[-\s]+модел\p{L}*\s+(?:персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)\s+(?:для|на)\s+(?:(?:моего|нашего|своего|нового)\s+)?(?:сайт|лендинг)/iu.test(q))return 'design';
+    // A standalone Roblox character model is a game asset.
+    if(!siteIntent&&/(?:3d|2d)[-\s]+модел\p{L}*\s+(?:персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)\s+(?:для|в)\s+(?:roblox|роблокс)/iu.test(q))return 'games';
     // Artwork of a character for a site is design, not a request to build the site.
     // Keep complete sites and animated/lip-synced mascots in their own routes.
     if(siteIntent &&
