@@ -311,7 +311,6 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const explicitBot=/(?:^|[^\p{L}])бот(?:а|у|е|ом|ы|ов|ам|ами|ах|ик(?:а|и|ов)?)?(?=$|[^\p{L}])|чат[-\s]?бот|(?:создать|разработать|сделать)\s+чат(?:а|е|у|ом)?(?=$|[^\p{L}])/iu.test(q);
     // Chat requested FOR an existing website is a bot/widget deliverable;
     // a new site WITH a chat feature remains a website request.
-    if(siteIntent&&/(?:^|[^\p{L}])чат\s+(?:(?:для|на)\s+(?:(?:моего|нашего|своего)\s+)?(?:сайт|лендинг)|на\s+(?:нашем|мо[её]м|этом)\s+сайт\p{L}*)/iu.test(q))return 'bots';
     // Explicit requests for examples or contact details outrank the service mentioned.
     // Keep price/time questions first, including "примерно сколько стоит".
     // Prices, payments and deadlines inside a product brief are features, not estimates.
@@ -330,6 +329,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const featureNotEstimate=(featureBrief||paymentAsFeature||paymentIntegrationBrief)&&!asksTime&&!asksPrice;
     const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:patterns.find(([key])=>key==='price')[1].test(q)?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // A direct price/deadline question takes precedence over the chatbot deliverable.
+    if(siteIntent&&/(?:^|[^\p{L}])чат\s+(?:(?:для|на)\s+(?:(?:моего|нашего|своего)\s+)?(?:сайт|лендинг)|на\s+(?:нашем|мо[её]м|этом)\s+сайт\p{L}*)/iu.test(q))return 'bots';
     // Animating an existing character is a mascot/assistant request, even for a site.
     // Game, video, illustration and full-site briefs keep their own categories.
     const animatedCharacter=/(?:анимир\p{L}*|анимаци\p{L}*|ожив\p{L}*|артикуляц\p{L}*|липсинк\p{L}*|lip[-\s]?sync|морга\p{L}*|двига\p{L}*|мимик\p{L}*)/iu.test(q) &&
