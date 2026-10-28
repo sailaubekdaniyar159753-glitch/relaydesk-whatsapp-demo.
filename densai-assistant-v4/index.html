@@ -329,7 +329,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       if(/(?:roblox|роблокс|игр|гейм|квиз|arcade)/iu.test(q))return 'games';
       if(/(?:видео|ролик|мультфильм|фильм|клип|shorts|reels|монтаж)/iu.test(q))return 'video';
       if(/(?:рисов|отрисов|концепт|дизайн)/iu.test(q))return 'design';
-      if(!(siteIntent&&/(?:сайт|лендинг)\p{L}*\s+(?:с|со)\s+(?:анимир\p{L}*|говорящ\p{L}*|интерактивн\p{L}*|персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)/iu.test(q)))return 'bots';
+      if(!(siteIntent&&/(?:сайт|лендинг)\p{L}*\s+(?:с|со)\s+(?:анимир\p{L}*|анимаци\p{L}*|артикуляц\p{L}*|липсинк\p{L}*|морга\p{L}*|мимик\p{L}*|говорящ\p{L}*|интерактивн\p{L}*|персонаж\p{L}*|маскот\p{L}*|аватар\p{L}*)/iu.test(q)))return 'bots';
     }
     // Artwork of a character for a site is design, not a request to build the site.
     // Keep complete sites and animated/lip-synced mascots in their own routes.
