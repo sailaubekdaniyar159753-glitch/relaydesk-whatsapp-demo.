@@ -93,10 +93,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
    Word boundaries drive short openings; unsupported voices use a gentle fallback. */
 #densai-helper-root .ds-mouth{position:absolute;left:50%;top:27.8%;width:5.8%;height:2.0%;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#4c2820 0%,#25120f 75%);transform:translate(-50%,-50%) scaleY(0);opacity:0;transform-origin:center}
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-mouth{animation:ds-mouth-talk .38s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-mouth{animation:ds-mouth-talk .27s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-mouth{animation:ds-mouth-talk var(--ds-mouth-duration,.27s) ease-out 1}
 /* Approximate the first vowel of a spoken word; do not replace the original face artwork. */
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-round:not(.ds-hit) .ds-mouth{animation:ds-mouth-round .27s ease-out 1}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-wide:not(.ds-hit) .ds-mouth{animation:ds-mouth-wide .27s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-round:not(.ds-hit) .ds-mouth{animation:ds-mouth-round var(--ds-mouth-duration,.27s) ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-wide:not(.ds-hit) .ds-mouth{animation:ds-mouth-wide var(--ds-mouth-duration,.27s) ease-out 1}
 @keyframes ds-mouth-round{0%,100%{transform:translate(-50%,-50%) scale(.7,0);opacity:0}42%{transform:translate(-50%,-50%) scale(.7,1.45);opacity:.88}72%{transform:translate(-50%,-50%) scale(.72,.5);opacity:.65}}
 @keyframes ds-mouth-wide{0%,100%{transform:translate(-50%,-50%) scale(1.35,0);opacity:0}42%{transform:translate(-50%,-50%) scale(1.4,.7);opacity:.88}72%{transform:translate(-50%,-50%) scale(1.25,.3);opacity:.65}}
 @media(max-height:560px){#densai-helper-root .ds-mouth{width:3.6%}}
@@ -687,6 +687,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Browser word offsets are approximate; use the first Russian vowel to vary
         // the mouth opening while retaining the existing generic fallback.
         const spokenWord=nextMouthWord(boundaryIndex);
+        // A fixed 270ms mouth pulse closes too early on longer Russian words.
+        // Estimate a bounded opening from word length; speech boundaries still
+        // control when each pulse starts (not a claim of phoneme-level lip-sync).
+        const letters=spokenWord.replace(/[^\p{L}]/gu,'').length;
+        const mouthDuration=Math.max(.18,Math.min(.5,(.12+letters*.045)/u.rate));
+        mouth.style.setProperty('--ds-mouth-duration',mouthDuration.toFixed(2)+'s');
         const vowel=spokenWord?.match(/[аоуыэяёюеи]/iu)?.[0]?.toLowerCase();
         character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёю]/u.test(vowel));
         character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиы]/u.test(vowel));
@@ -702,7 +708,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         void character.offsetWidth;
         character.classList.add('ds-word-pulse');
         clearTimeout(speechBeatTimer);
-        speechBeatTimer=setTimeout(()=>{if(token===speechToken)character.classList.remove('ds-word-pulse','ds-hand-pulse')},320);
+        speechBeatTimer=setTimeout(()=>{if(token===speechToken)character.classList.remove('ds-word-pulse','ds-hand-pulse')},Math.max(320,Math.ceil(mouthDuration*1000)+40));
         // If the voice stops reporting words, the timer restores gentle fallback motion.
       };
       const done=()=>{if(token===speechToken){speechOwnsUtterance=false;speechToken++;clearSpeechMotion()}};
