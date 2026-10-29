@@ -52,10 +52,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-arm{z-index:3}
 #densai-helper-root .ds-arm-left{clip-path:polygon(0 46%,30% 41%,37% 87%,27% 100%,0 100%);transform-origin:31% 48%}
 #densai-helper-root .ds-arm-right{clip-path:polygon(70% 41%,100% 46%,100% 100%,73% 100%,63% 87%);transform-origin:69% 48%}
-#densai-helper-root .ds-person.ds-hit .ds-rig{animation:ds-recoil .72s cubic-bezier(.2,.9,.2,1)}
-#densai-helper-root .ds-person.ds-hit .ds-head-group{animation:ds-head-jerk .72s cubic-bezier(.2,.9,.2,1)}
-#densai-helper-root .ds-person.ds-hit .ds-arm-left{animation:ds-arm-left-hit .72s cubic-bezier(.18,.86,.18,1)}
-#densai-helper-root .ds-person.ds-hit .ds-arm-right{animation:ds-arm-right-hit .72s cubic-bezier(.18,.86,.18,1)}
+#densai-helper-root .ds-person.ds-hit:not(.ds-speech-paused) .ds-rig{animation:ds-recoil .72s cubic-bezier(.2,.9,.2,1)}
+#densai-helper-root .ds-person.ds-hit:not(.ds-speech-paused) .ds-head-group{animation:ds-head-jerk .72s cubic-bezier(.2,.9,.2,1)}
+#densai-helper-root .ds-person.ds-hit:not(.ds-speech-paused) .ds-arm-left{animation:ds-arm-left-hit .72s cubic-bezier(.18,.86,.18,1)}
+#densai-helper-root .ds-person.ds-hit:not(.ds-speech-paused) .ds-arm-right{animation:ds-arm-right-hit .72s cubic-bezier(.18,.86,.18,1)}
 #densai-helper-root .ds-person.ds-idle:not(.ds-speech-paused):not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-rig{animation:ds-float 4.5s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-idle:not(.ds-speech-paused):not(.ds-speaking):not(.ds-hit) .ds-head-group{animation:ds-head-breathe 4.5s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-idle:not(.ds-speech-paused):not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
@@ -104,7 +104,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 
 
 #densai-helper-root .ds-hit-star{position:absolute;right:2px;top:42px;color:#ffcd5a;opacity:0;font-size:28px;pointer-events:none}
-#densai-helper-root .ds-person.ds-hit .ds-hit-star{animation:ds-star .65s ease-out}
+#densai-helper-root .ds-person.ds-hit:not(.ds-speech-paused) .ds-hit-star{animation:ds-star .65s ease-out}
 #densai-helper-root .ds-tools{display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:auto;margin-top:-7px;position:relative}
 #densai-helper-root .ds-open{background:linear-gradient(105deg,#0875c8,#03bcf4);border:1px solid #8cf3ff;border-radius:22px;padding:10px 15px;white-space:nowrap;font-weight:750;font-size:12px;box-shadow:0 3px 19px #0abfff99;color:white}
 #densai-helper-root .ds-sound{background:#112e48e8;border:1px solid #346784;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;font-size:16px;padding:0}
