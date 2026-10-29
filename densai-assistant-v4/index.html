@@ -89,8 +89,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @keyframes ds-word-hand{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(-4deg) translateY(-1px)}}
 @keyframes ds-word-hand-left{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(4deg) translateY(-1px)}}
 /* A restrained speaking mouth uses the ORIGINAL mascot artwork beneath it.
+   Poster is 300x542: visible lips are near y=151 (~27.8%), not at 32.5% (neck).
    Word boundaries drive short openings; unsupported voices use a gentle fallback. */
-#densai-helper-root .ds-mouth{position:absolute;left:50%;top:32.5%;width:5.8%;height:2.0%;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#4c2820 0%,#25120f 75%);transform:translate(-50%,-50%) scaleY(0);opacity:0;transform-origin:center}
+#densai-helper-root .ds-mouth{position:absolute;left:50%;top:27.8%;width:5.8%;height:2.0%;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#4c2820 0%,#25120f 75%);transform:translate(-50%,-50%) scaleY(0);opacity:0;transform-origin:center}
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-mouth{animation:ds-mouth-talk .38s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-mouth{animation:ds-mouth-talk .27s ease-out 1}
 /* Approximate the first vowel of a spoken word; do not replace the original face artwork. */
