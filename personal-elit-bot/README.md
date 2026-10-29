@@ -17,3 +17,7 @@ Deploy command: `npx wrangler deploy`
 7. Bot sends only replies to incoming messages and enforces its own conservative `900` message/month cap; Meta billing remains independent.
 
 Endpoints: `/health` (read-only), `/webhook` (Meta challenge and signed POST). Never claim connected unless health says metaConnected=true and actual Meta handshake passes.
+
+## Запуск автоматической сборки
+
+Обновление этой документации используется для проверки, что Cloudflare видит push в производственную ветку `personal-elit-bot`. После успешного деплоя эндпоинт `/health` должен вернуть JSON с `deployed: true`. До настройки Meta и D1 реальный WhatsApp-бот не принимает сообщения.
