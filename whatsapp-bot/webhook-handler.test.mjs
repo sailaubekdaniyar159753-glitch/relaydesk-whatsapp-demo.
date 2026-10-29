@@ -13,4 +13,9 @@ assert.equal(await verifyMetaSignature(body, signature, env.META_APP_SECRET), tr
 assert.equal(await verifyMetaSignature(body + "changed", signature, env.META_APP_SECRET), false);
 assert.equal((await handleWhatsAppWebhook(new Request(url, { method: "POST", body, headers: { "x-hub-signature-256": signature } }), env)).status, 200);
 assert.equal((await handleWhatsAppWebhook(new Request(url, { method: "POST", body, headers: { "x-hub-signature-256": "sha256=" + "0".repeat(64) } }), env)).status, 403);
-console.log("6 webhook tests passed");
+const malformed = JSON.stringify({object:"whatsapp_business_account",entry:"bad-shape"});
+const signed = (b) => "sha256=" + createHmac("sha256",env.META_APP_SECRET).update(b).digest("hex");
+assert.equal((await handleWhatsAppWebhook(new Request(url,{method:"POST",body:malformed,headers:{"x-hub-signature-256":signed(malformed)}}),env)).status,200);
+const oversized = "x".repeat(1048577);
+assert.equal((await handleWhatsAppWebhook(new Request(url,{method:"POST",body:oversized}),env)).status,413);
+console.log("8 webhook tests passed");
