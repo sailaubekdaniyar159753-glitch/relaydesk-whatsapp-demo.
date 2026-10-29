@@ -56,10 +56,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-person.ds-hit .ds-head-group{animation:ds-head-jerk .72s cubic-bezier(.2,.9,.2,1)}
 #densai-helper-root .ds-person.ds-hit .ds-arm-left{animation:ds-arm-left-hit .72s cubic-bezier(.18,.86,.18,1)}
 #densai-helper-root .ds-person.ds-hit .ds-arm-right{animation:ds-arm-right-hit .72s cubic-bezier(.18,.86,.18,1)}
-#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-rig{animation:ds-float 4.5s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-head-group{animation:ds-head-breathe 4.5s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-idle:not(.ds-speaking):not(.ds-hit) .ds-arm-right{animation:ds-arm-idle-right 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speech-paused):not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-rig{animation:ds-float 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speech-paused):not(.ds-speaking):not(.ds-hit) .ds-head-group{animation:ds-head-breathe 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speech-paused):not(.ds-speaking):not(.ds-hit):not(.ds-ack) .ds-arm-left{animation:ds-arm-idle-left 4.5s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-idle:not(.ds-speech-paused):not(.ds-speaking):not(.ds-hit) .ds-arm-right{animation:ds-arm-idle-right 4.5s ease-in-out infinite}
 
 
 /* A short acknowledgment after a chat reply. Speech and hit animations take priority. */
@@ -478,7 +478,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     clearTimeout(speechEndTimer);speechEndTimer=null;
     clearTimeout(speechPauseTimer);speechPauseTimer=null;
     clearTimeout(speechHealthTimer);speechHealthTimer=null;speechInactiveChecks=0;
-    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
+    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide','ds-speech-paused');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if(speechOwnsUtterance&&'speechSynthesis' in window){speechOwnsUtterance=false;try{speechSynthesis.cancel()}catch(e){}}}
   function reportSpeechFailure(){
@@ -547,6 +547,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           // suspends the active-speech timeout while audio is genuinely paused.
           if(speechStarted){u.onpause();return;}
           character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
+          character.classList.add('ds-speech-paused');
           speechInactiveChecks=0;
           // Some engines never fire onpause. Bound the silent pause separately
           // because the active-speech watchdog intentionally ignores pauses.
@@ -596,6 +597,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // utterance holding the sound control in an apparently active state.
       u.onpause=()=>{if(token===speechToken&&speechStarted&&!speechPaused){
         speechPaused=true;clearSpeechMotion();
+        character.classList.add('ds-speech-paused'); // Freeze idle movement while the voice is paused.
         speechHealthTimer=setTimeout(checkSpeechHealth,1500);
         speechPauseTimer=setTimeout(()=>{
           if(token!==speechToken||!speechPaused||muted||document.hidden)return;
@@ -609,7 +611,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         if(token!==speechToken||!speechSynthesis.speaking||speechSynthesis.paused||(!speechPaused&&speechStarted)||muted||document.hidden)return;
         // Resumed engines may restart word offsets and elapsedTime.
         if(speechPaused){lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;lastWordBeat=-Infinity;}
-        speechStarted=true;speechPaused=false;clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
+        speechStarted=true;speechPaused=false;character.classList.remove('ds-speech-paused');clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
         if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive();
       };
       u.onresume=()=>{
@@ -710,6 +712,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         if(token!==speechToken||muted||document.hidden)return;
         if(speechSynthesis.paused){
           // Some engines queue an utterance while globally paused without firing onpause.
+          character.classList.add('ds-speech-paused');
           // Bound this otherwise untracked wait, and clear it when speech actually begins.
           speechPauseTimer=setTimeout(()=>{
             if(token!==speechToken||muted||document.hidden)return;
