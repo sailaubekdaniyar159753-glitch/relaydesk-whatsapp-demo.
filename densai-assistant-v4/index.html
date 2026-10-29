@@ -501,12 +501,21 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // Track the next text word in that case instead of repeating the first mouth shape.
       const makeMouthWordTracker=(text)=>{
         const words=[...text.matchAll(/[\p{L}\p{N}-]+/gu)];
-        let current=-1,previousOffset=-1;
+        let current=-1,previousOffset=-1,relativeOffsets=false;
         return (offset)=>{
-          if(offset>=0&&offset<text.length&&offset!==previousOffset){
-            const found=words.findIndex((word,i)=>word.index<=offset&&(i===words.length-1||words[i+1].index>offset));
-            if(found>=0)current=found;
-          }else if(words.length)current=Math.min(current+1,words.length-1);
+          if(!words.length)return '';
+          if(offset>=0&&offset<text.length&&offset!==previousOffset&&!relativeOffsets){
+            // Some engines restart offsets at each sentence instead of using
+            // absolute positions in the utterance. Never rewind the face to word one.
+            if(previousOffset>=0&&offset<previousOffset){
+              relativeOffsets=true;
+              current=Math.min(current+1,words.length-1);
+            }else{
+              const found=words.findIndex((word,i)=>word.index<=offset&&(i===words.length-1||words[i+1].index>offset));
+              if(found>=current)current=found;
+              else current=Math.min(current+1,words.length-1);
+            }
+          }else current=Math.min(current+1,words.length-1);
           previousOffset=offset;
           return words[current]?.[0]||'';
         };
