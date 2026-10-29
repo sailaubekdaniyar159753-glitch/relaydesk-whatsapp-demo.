@@ -737,7 +737,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     e.preventDefault();
     const explicitSend=performance.now()-lastExplicitSend<1000;
     lastExplicitSend=-Infinity;
-    if(composingMessage||(isImeConfirming()&&!explicitSend))return;
+    if((composingMessage||isImeConfirming())&&!explicitSend)return;
     const q=input.value.trim();if(!q)return;
     respond(q,text[classify(q)]);input.value='';
     // Do not reopen the software keyboard after sending a mobile message.
