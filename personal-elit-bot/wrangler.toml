@@ -1,0 +1,10 @@
+name = "personal-elit-bot"
+main = "src/index.js"
+compatibility_date = "2026-10-29"
+workers_dev = true
+
+[vars]
+META_API_VERSION = "v25.0"
+MONTHLY_REPLY_LIMIT = "900"
+# Add D1 binding DB only once database personal-elit-leads exists.
+# No Meta tokens or private keys in GitHub.
