@@ -6,6 +6,7 @@ workers_dev = true
 [vars]
 META_API_VERSION = "v25.0"
 MONTHLY_REPLY_LIMIT = "900"
+PII_STORAGE_ENABLED = "false"
 # Meta credentials must be configured as encrypted Worker secrets only.
 
 [[d1_databases]]
