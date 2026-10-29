@@ -497,6 +497,21 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;wordBoundaryCount=0;lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;const token=speechToken;
     try{
       const spoken=s.replace(/https?:\/\/[^\s]+/gi,'ссылка есть в чате').replace(/[^\p{L}\p{N}\s!?,.:;\-]/gu,'').replace(/\s+/g,' ').replace(/\s+\./g,'.').trim();
+      // Some voices emit a new word boundary but keep charIndex frozen at zero.
+      // Track the next text word in that case instead of repeating the first mouth shape.
+      const makeMouthWordTracker=(text)=>{
+        const words=[...text.matchAll(/[\p{L}\p{N}-]+/gu)];
+        let current=-1,previousOffset=-1;
+        return (offset)=>{
+          if(offset>=0&&offset<text.length&&offset!==previousOffset){
+            const found=words.findIndex((word,i)=>word.index<=offset&&(i===words.length-1||words[i+1].index>offset));
+            if(found>=0)current=found;
+          }else if(words.length)current=Math.min(current+1,words.length-1);
+          previousOffset=offset;
+          return words[current]?.[0]||'';
+        };
+      };
+      const nextMouthWord=makeMouthWordTracker(spoken);
       const u=new SpeechSynthesisUtterance(spoken);u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
        // Browser defaults are not always Russian; use a Russian voice if available.
        // Voices may load later, so resolve them afresh for each utterance.
@@ -650,8 +665,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         lastWordBeat=now;
         // Browser word offsets are approximate; use the first Russian vowel to vary
         // the mouth opening while retaining the existing generic fallback.
-        const spokenWord=boundaryIndex>=0&&boundaryIndex<spoken.length
-          ?spoken.slice(boundaryIndex).match(/^\s*([\p{L}\p{N}-]+)/u)?.[1]:'';
+        const spokenWord=nextMouthWord(boundaryIndex);
         const vowel=spokenWord?.match(/[аоуыэяёюеи]/iu)?.[0]?.toLowerCase();
         character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёю]/u.test(vowel));
         character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиы]/u.test(vowel));
