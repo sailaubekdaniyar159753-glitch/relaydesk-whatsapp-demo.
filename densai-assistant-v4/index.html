@@ -343,6 +343,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(!explicitBot&&!asksPrice&&!asksTime&&/(?:какой|какая|какие|можно|скиньте|пришлите|дайте|отправьте|подскажите)\s+(?:(?:у\s+вас|ваш(?:и|его)?|ваша|мне|свой|свои)\s+)?(?:ссылк\p{L}*\s+(?:на|в)\s+)?(?:телеграм|telegram|whatsapp|ватсап|вацап|тг|номер|контакт\p{L}*)(?=$|[^\p{L}])|(?:ваш|ваша|ваши|твой)\s+(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)(?=$|[^\p{L}])|(?:можно|как|где)\s+(?:ли\s+)?(?:с\s+вами\s+)?связаться\s+(?:с\s+вами\s+)?(?:по|через|в)\s+(?:whatsapp|ватсап|вацап|telegram|телеграм|тг)(?=$|[^\p{L}])|где\s+(?:вас|тебя|студию)\s+(?:найти|искать)|(?:у\s+вас\s+)?(?:есть|имеется)\s+(?:ли\s+)?(?:у\s+вас\s+)?(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)(?=$|[^\p{L}])|(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)\s+(?:у\s+вас\s+)?(?:есть|имеется)(?=$|[^\p{L}])/iu.test(q))return 'contact';
     const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:(!adviceNotPrice&&patterns.find(([key])=>key==='price')[1].test(q))?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
+    // Direct enquiries about contacting us or leaving a lead are not bot/CRM orders.
+    // Do not claim unsupported channels: the contact answer gives our verified Telegram.
+    if(!explicitBot && (
+      /(?:^|[.!?]\s*)(?:можно|могу|можем)\s+(?:(?:ли|я|мы)\s+){0,2}(?:написать|связаться|созвониться|позвонить|оставить\s+заявку|записаться\s+на\s+(?:звонок|созвон))(?=$|[^\p{L}])/iu.test(q) ||
+      /(?:какой\s+у\s+вас|(?:можно\s+узнать|подскажите)\s+(?:ваш|вашу|ваши|вашего)|(?:у\s+вас\s+есть|есть\s+ли\s+у\s+вас))\s+(?:(?:электронн\p{L}*)\s+)?(?:instagram|инстаграм\p{L}*|e[-\s]?mail|почт\p{L}*)(?=$|[^\p{L}])/iu.test(q)
+    ))return 'contact';
     // How to place an order or request a consultation is a contact question,
     // not a request to build the service mentioned after "заказать".
     if(/(?:^|[.!?]\s*)(?:как|где)\s+(?:(?:мне|у\s+вас|вам|можно|здесь)\s+){0,2}(?:заказать|оформить\s+заказ|сделать\s+заказ)|(?:^|[^\p{L}])(?:нужн\p{L}*|хочу|можно\s+получить)\s+(?:(?:бесплатн\p{L}*|коротк\p{L}*)\s+)?консультаци\p{L}*|(?:можно|хочу)\s+(?:ли\s+)?(?:заказать|получить|записаться\s+на)\s+консультаци\p{L}*|(?:как|где)\s+(?:получить|заказать|записаться\s+на)\s+консультаци\p{L}*/iu.test(q))return 'contact';
