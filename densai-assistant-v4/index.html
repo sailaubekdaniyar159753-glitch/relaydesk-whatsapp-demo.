@@ -457,6 +457,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Broad service enquiries need a useful overview, not an unrelated fallback.
     // Anchor the wording to avoid overriding specific site, bot, design or price requests.
     if(/^(?:какие\s+(?:(?:у\s+вас)\s+)?(?:есть\s+)?(?:услуги|направления)(?:\s+вы\s+(?:предлагаете|оказываете|предоставляете))?|какие\s+(?:услуги|направления)\s+у\s+вас\s+есть|что\s+вы\s+(?:умеете|можете\s+(?:сделать|предложить))|чем\s+(?:вы\s+)?занимаетесь|расскажите\s+(?:о|об|про)\s+(?:(?:ваших?|своих?)\s+)?(?:услугах|услуги|направлениях|направления)|что\s+вы\s+(?:делаете|предлагаете)|чем\s+занимается\s+(?:densai(?:\s+studio)?|ваша\s+студия))\s*[?!.]*$/iu.test(q.trim()))return 'services';
+    // Natural questions about the studio's overall offer should not fall through to a generic answer.
+    // Match complete enquiries only; specific services, estimates and portfolio keep their priority.
+    if(/^(?:какие\s+(?:услуги|направления)\s+(?:есть\s+)?(?:у\s+)?(?:densai(?:\s+studio)?|вашей\s+студии)|расскажите\s+(?:о|об|про)\s+(?:услугах|направлениях|направления)\s+(?:вашей\s+студии|densai(?:\s+studio)?)|что\s+вы\s+предлагаете\s+(?:клиентам|заказчикам)|что\s+умеет\s+ваш\s+(?:помощник|ассистент)|чем\s+вы\s+можете\s+помочь)\s*[?!.]*$/iu.test(q.trim()))return 'services';
     const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&!(featureNotEstimate&&(key==='price'||key==='time'))&&!(adviceNotPrice&&key==='price')&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
