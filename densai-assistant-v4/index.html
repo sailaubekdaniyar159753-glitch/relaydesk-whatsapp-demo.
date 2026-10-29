@@ -682,11 +682,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Every fresh word extends the inactivity window, even if its gesture is throttled.
         clearTimeout(speechFallbackTimer);
         speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse')},700);
+        // Advance the text cursor on every accepted boundary, including words
+        // whose animation is throttled; frozen charIndex engines otherwise lag.
+        const spokenWord=nextMouthWord(boundaryIndex);
         if(now-lastWordBeat<160)return;
         lastWordBeat=now;
         // Browser word offsets are approximate; use the first Russian vowel to vary
         // the mouth opening while retaining the existing generic fallback.
-        const spokenWord=nextMouthWord(boundaryIndex);
         // A fixed 270ms mouth pulse closes too early on longer Russian words.
         // Estimate a bounded opening from word length; speech boundaries still
         // control when each pulse starts (not a claim of phoneme-level lip-sync).
