@@ -341,6 +341,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Asking for our own messenger details is not a chatbot order or a price in tenge.
     // Preserve explicit pricing, deadlines and bot-development requests.
     if(!explicitBot&&!asksPrice&&!asksTime&&/(?:какой|какая|какие|можно|скиньте|пришлите|дайте|отправьте|подскажите)\s+(?:(?:у\s+вас|ваш(?:и|его)?|ваша|мне|свой|свои)\s+)?(?:ссылк\p{L}*\s+(?:на|в)\s+)?(?:телеграм|telegram|whatsapp|ватсап|вацап|тг|номер|контакт\p{L}*)(?=$|[^\p{L}])|(?:ваш|ваша|ваши|твой)\s+(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)(?=$|[^\p{L}])|(?:можно|как|где)\s+(?:ли\s+)?(?:с\s+вами\s+)?связаться\s+(?:с\s+вами\s+)?(?:по|через|в)\s+(?:whatsapp|ватсап|вацап|telegram|телеграм|тг)(?=$|[^\p{L}])|где\s+(?:вас|тебя|студию)\s+(?:найти|искать)|(?:у\s+вас\s+)?(?:есть|имеется)\s+(?:ли\s+)?(?:у\s+вас\s+)?(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)(?=$|[^\p{L}])|(?:телеграм|telegram|whatsapp|ватсап|вацап|тг)\s+(?:у\s+вас\s+)?(?:есть|имеется)(?=$|[^\p{L}])/iu.test(q))return 'contact';
+    // Navigation to OUR studio must not be mistaken for a website order or an unknown query.
+    // Only match explicitly owned destinations; a client's website brief stays a site request.
+    if(!explicitBot&&!asksPrice&&!asksTime){
+      if(/(?:скин(?:ьте|ь)|пришл(?:ите|и)|дайте|отправ(?:ьте|ь))\s+(?:(?:мне|пожалуйста)\s+)?(?:ваш\s+сайт|сайт\s+(?:студии|densai)|сайт\s+вашей\s+студии)(?=$|[^\p{L}])/iu.test(q))return 'portfolio';
+      if(/(?:как|где)\s+(?:мне\s+)?(?:вас|тебя|студию|densai)\s+(?:найти|отыскать|искать|разыскать)(?=$|[^\p{L}])|(?:как|где)\s+(?:мне\s+)?(?:найти|отыскать|искать)\s+(?:вас|тебя|студию|densai)(?=$|[^\p{L}])|(?:можно|могу|хочу|можем)\s+(?:(?:ли|я|мы)\s+){0,2}(?:заказать|запланировать|назначить)\s+(?:звонок|созвон|консультацию)(?=$|[^\p{L}])/iu.test(q))return 'contact';
+    }
     const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:(!adviceNotPrice&&patterns.find(([key])=>key==='price')[1].test(q))?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
     // Direct enquiries about contacting us or leaving a lead are not bot/CRM orders.
