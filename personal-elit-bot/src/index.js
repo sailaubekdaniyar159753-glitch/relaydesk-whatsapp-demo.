@@ -71,10 +71,25 @@ async function onMessage(env,m){
  const delivered=await send(env,phone,out.reply);
  if(delivered)await env.DB.prepare('UPDATE events SET sent=1 WHERE id=?').bind(id).run();
 }
+async function ensureTables(db){
+ const tables=[
+  'CREATE TABLE IF NOT EXISTS sessions(phone TEXT PRIMARY KEY, state TEXT NOT NULL, updated_at TEXT DEFAULT CURRENT_TIMESTAMP)',
+  'CREATE TABLE IF NOT EXISTS leads(id TEXT PRIMARY KEY, phone TEXT NOT NULL, role TEXT NOT NULL, service TEXT, details TEXT NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP)',
+  'CREATE TABLE IF NOT EXISTS events(id TEXT PRIMARY KEY, phone TEXT NOT NULL, reply TEXT NOT NULL, sent INTEGER DEFAULT 0, created_at TEXT DEFAULT CURRENT_TIMESTAMP)',
+  'CREATE TABLE IF NOT EXISTS usage(month TEXT PRIMARY KEY, used INTEGER DEFAULT 0)',
+  'CREATE INDEX IF NOT EXISTS idx_leads_created ON leads(created_at)'
+ ];
+ for(const sql of tables)await db.prepare(sql).run();
+}
+
 export default {
  async fetch(request,env){
   const u=new URL(request.url);
-  if(u.pathname==='/health')return json({deployed:true,metaConnected:Boolean(env.META_PHONE_NUMBER_ID&&env.META_ACCESS_TOKEN&&env.META_APP_SECRET),storageConnected:Boolean(env.DB)});
+  if(u.pathname==='/health'){
+   if(!env.DB)return json({deployed:true,metaConnected:false,storageConnected:false,schemaReady:false});
+   try{await ensureTables(env.DB);return json({deployed:true,metaConnected:Boolean(env.META_PHONE_NUMBER_ID&&env.META_ACCESS_TOKEN&&env.META_APP_SECRET),storageConnected:true,schemaReady:true});}
+   catch(e){console.error('Database initialization failed',e?.message);return json({deployed:true,storageConnected:true,schemaReady:false},503);}
+  }
   if(u.pathname!=='/webhook')return new Response('Not found',{status:404});
   if(request.method==='GET'){
    const ok=u.searchParams.get('hub.mode')==='subscribe'&&env.META_VERIFY_TOKEN&&u.searchParams.get('hub.verify_token')===env.META_VERIFY_TOKEN;
@@ -85,6 +100,7 @@ export default {
   const raw=await request.arrayBuffer();if(raw.byteLength>262144)return new Response('Payload too large',{status:413});
   if(!await sigOk(raw,request.headers.get('x-hub-signature-256'),env.META_APP_SECRET))return new Response('Forbidden',{status:403});
   try{
+   await ensureTables(env.DB);
    const payload=JSON.parse(new TextDecoder().decode(raw));
    if(payload.object==='whatsapp_business_account')for(const e of payload.entry||[])for(const c of e.changes||[]){
     if(String(c.value?.metadata?.phone_number_id||'')!==String(env.META_PHONE_NUMBER_ID))continue;
