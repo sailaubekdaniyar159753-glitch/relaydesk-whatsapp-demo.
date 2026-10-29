@@ -99,6 +99,7 @@ export default {
   if(!env.META_APP_SECRET||!env.META_ACCESS_TOKEN||!env.META_PHONE_NUMBER_ID||!env.DB)return new Response('Setup incomplete',{status:503});
   const raw=await request.arrayBuffer();if(raw.byteLength>262144)return new Response('Payload too large',{status:413});
   if(!await sigOk(raw,request.headers.get('x-hub-signature-256'),env.META_APP_SECRET))return new Response('Forbidden',{status:403});
+  if(env.PII_STORAGE_ENABLED!=='true')return new Response('Personal data storage is disabled pending Kazakhstan data-residency compliance',{status:503});
   try{
    await ensureTables(env.DB);
    const payload=JSON.parse(new TextDecoder().decode(raw));
