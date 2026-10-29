@@ -29,8 +29,11 @@ export async function handleWhatsAppWebhook(request, env) {
   }
   if (request.method !== "POST") return new Response("Method not allowed", { status: 405 });
   if (!env.META_APP_SECRET) return new Response("Not configured", { status: 503 });
-  const body = await request.text();
-  if (body.length > 1048576) return new Response("Payload too large", { status: 413 });
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (contentLength > 1048576) return new Response("Payload too large", { status: 413 });
+  const raw = await request.arrayBuffer();
+  if (raw.byteLength > 1048576) return new Response("Payload too large", { status: 413 });
+  const body = new TextDecoder().decode(raw);
   if (!(await verifyMetaSignature(body, request.headers.get("x-hub-signature-256"), env.META_APP_SECRET))) {
     return new Response("Invalid signature", { status: 403 });
   }
@@ -39,10 +42,14 @@ export async function handleWhatsAppWebhook(request, env) {
   if (payload?.object !== "whatsapp_business_account") return new Response("Ignored", { status: 200 });
   // Safe initial integration: authenticate and parse. Do not send or persist data
   // until idempotency, opt-out persistence, and production number configuration are tested.
-  const messages = (payload.entry || []).flatMap(entry =>
-    (entry.changes || []).flatMap(change => change.field === "messages" ? (change.value?.messages || []) : []));
+  const entries = Array.isArray(payload.entry) ? payload.entry : [];
+  const messages = entries.flatMap(entry => {
+    const changes = Array.isArray(entry?.changes) ? entry.changes : [];
+    return changes.flatMap(change => change?.field === "messages" && Array.isArray(change?.value?.messages)
+      ? change.value.messages : []);
+  });
   for (const message of messages) {
-    if (message.type === "text" && typeof message.text?.body === "string") {
+    if (message?.type === "text" && typeof message.text?.body === "string") {
       buildReply(message.text.body);
     }
   }
