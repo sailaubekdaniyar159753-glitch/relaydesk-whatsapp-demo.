@@ -6,5 +6,9 @@ workers_dev = true
 [vars]
 META_API_VERSION = "v25.0"
 MONTHLY_REPLY_LIMIT = "900"
-# Add D1 binding DB only once database personal-elit-leads exists.
-# No Meta tokens or private keys in GitHub.
+# Meta credentials must be configured as encrypted Worker secrets only.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "personal-elit-leads"
+database_id = "3ee59648-9268-4efc-9d1c-7697f4f14db8"
