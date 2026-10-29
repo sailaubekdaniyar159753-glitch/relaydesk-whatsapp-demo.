@@ -1,0 +1,26 @@
+name: WhatsApp module tests (isolated)
+on:
+  push:
+    paths:
+      - "whatsapp-bot/**"
+      - ".github/workflows/whatsapp-module-tests.yml"
+  pull_request:
+    paths:
+      - "whatsapp-bot/**"
+      - ".github/workflows/whatsapp-module-tests.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Test reply engine
+        run: node whatsapp-bot/reply-engine.test.mjs
+      - name: Test signed webhooks
+        run: node whatsapp-bot/webhook-handler.test.mjs
