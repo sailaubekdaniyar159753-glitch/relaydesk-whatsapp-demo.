@@ -63,8 +63,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 
 
 /* A short acknowledgment after a chat reply. Speech and hit animations take priority. */
-#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking) .ds-head-group{animation:ds-ack-head .68s ease-in-out 1}
-#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking) .ds-arm-right{animation:ds-ack-hand .68s ease-in-out 1}
+#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking):not(.ds-speech-paused) .ds-head-group{animation:ds-ack-head .68s ease-in-out 1}
+#densai-helper-root .ds-person.ds-ack:not(.ds-hit):not(.ds-speaking):not(.ds-speech-paused) .ds-arm-right{animation:ds-ack-hand .68s ease-in-out 1}
 @keyframes ds-ack-head{0%,100%{transform:translate3d(0,0,0) rotate(0)}30%{transform:translate3d(0,1.2px,0) rotate(-1.8deg)}65%{transform:translate3d(0,-.8px,0) rotate(.8deg)}}
 @keyframes ds-ack-hand{0%,100%{transform:rotate(0) translateY(0)}35%{transform:rotate(-4deg) translateY(-1.5px)}70%{transform:rotate(1.5deg) translateY(0)}}
 
