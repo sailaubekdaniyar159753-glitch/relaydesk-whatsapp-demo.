@@ -93,6 +93,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-mouth{position:absolute;left:50%;top:34.1%;width:5.8%;height:2.0%;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#4c2820 0%,#25120f 75%);transform:translate(-50%,-50%) scaleY(0);opacity:0;transform-origin:center}
 #densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-mouth{animation:ds-mouth-talk .38s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-mouth{animation:ds-mouth-talk .27s ease-out 1}
+/* Approximate the first vowel of a spoken word; do not replace the original face artwork. */
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-round:not(.ds-hit) .ds-mouth{animation:ds-mouth-round .27s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-wide:not(.ds-hit) .ds-mouth{animation:ds-mouth-wide .27s ease-out 1}
+@keyframes ds-mouth-round{0%,100%{transform:translate(-50%,-50%) scale(.7,0);opacity:0}42%{transform:translate(-50%,-50%) scale(.7,1.45);opacity:.88}72%{transform:translate(-50%,-50%) scale(.72,.5);opacity:.65}}
+@keyframes ds-mouth-wide{0%,100%{transform:translate(-50%,-50%) scale(1.35,0);opacity:0}42%{transform:translate(-50%,-50%) scale(1.4,.7);opacity:.88}72%{transform:translate(-50%,-50%) scale(1.25,.3);opacity:.65}}
 @media(max-height:560px){#densai-helper-root .ds-mouth{width:3.6%}}
 @keyframes ds-mouth-talk{0%,100%{transform:translate(-50%,-50%) scaleY(0);opacity:0}42%{transform:translate(-50%,-50%) scaleY(1);opacity:.88}72%{transform:translate(-50%,-50%) scaleY(.42);opacity:.65}}
 
@@ -473,7 +478,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     clearTimeout(speechEndTimer);speechEndTimer=null;
     clearTimeout(speechPauseTimer);speechPauseTimer=null;
     clearTimeout(speechHealthTimer);speechHealthTimer=null;speechInactiveChecks=0;
-    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse');
+    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if(speechOwnsUtterance&&'speechSynthesis' in window){speechOwnsUtterance=false;try{speechSynthesis.cancel()}catch(e){}}}
   function reportSpeechFailure(){
@@ -517,7 +522,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           // Route silent engine pauses through the normal pause handler. This also
           // suspends the active-speech timeout while audio is genuinely paused.
           if(speechStarted){u.onpause();return;}
-          character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse');
+          character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
           speechInactiveChecks=0;
           // Some engines never fire onpause. Bound the silent pause separately
           // because the active-speech watchdog intentionally ignores pauses.
@@ -643,6 +648,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         speechFallbackTimer=setTimeout(()=>{if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode','ds-word-pulse','ds-word-left','ds-hand-pulse')},700);
         if(now-lastWordBeat<160)return;
         lastWordBeat=now;
+        // Browser word offsets are approximate; use the first Russian vowel to vary
+        // the mouth opening while retaining the existing generic fallback.
+        const spokenWord=boundaryIndex>=0&&boundaryIndex<spoken.length
+          ?spoken.slice(boundaryIndex).match(/^\s*([\p{L}\p{N}-]+)/u)?.[1]:'';
+        const vowel=spokenWord?.match(/[аоуыэяёюеи]/iu)?.[0]?.toLowerCase();
+        character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёю]/u.test(vowel));
+        character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиы]/u.test(vowel));
         character.classList.add('ds-word-mode');
         character.classList.remove('ds-word-pulse');
         wordBoundaryCount++;
@@ -719,7 +731,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       clearTimeout(animationTimer);animationTimer=null;
       clearTimeout(speechBeatTimer);speechBeatTimer=null;
       clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
-      character.classList.remove('ds-ack','ds-hit','ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse');
+      character.classList.remove('ds-ack','ds-hit','ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
       character.classList.add('ds-idle');
     }
     root.dataset.minimized=String(next);
