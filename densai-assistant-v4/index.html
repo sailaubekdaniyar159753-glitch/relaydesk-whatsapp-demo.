@@ -80,10 +80,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
    Browsers without boundary events retain the existing continuous fallback. */
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-head-group,
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode:not(.ds-word-pulse):not(.ds-hit) .ds-arm-right{animation:none}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-group{animation:ds-word-nod .27s ease-out 1}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-word-tilt:not(.ds-hit) .ds-head-group{animation:ds-word-nod-tilt .27s ease-out 1}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse:not(.ds-hit):not(.ds-word-left) .ds-arm-right{animation:ds-word-hand .3s ease-out 1}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse.ds-word-left:not(.ds-hit) .ds-arm-left{animation:ds-word-hand-left .3s ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-head-group{animation:ds-word-nod var(--ds-word-gesture-duration,.3s) ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-word-tilt:not(.ds-hit) .ds-head-group{animation:ds-word-nod-tilt var(--ds-word-gesture-duration,.3s) ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse:not(.ds-hit):not(.ds-word-left) .ds-arm-right{animation:ds-word-hand var(--ds-word-gesture-duration,.3s) ease-out 1}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-hand-pulse.ds-word-left:not(.ds-hit) .ds-arm-left{animation:ds-word-hand-left var(--ds-word-gesture-duration,.3s) ease-out 1}
 @keyframes ds-word-nod{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(-1.5deg)}}
 @keyframes ds-word-nod-tilt{0%,100%{transform:translateY(0) rotate(0)}38%{transform:translateY(1.3px) rotate(1.5deg)}}
 @keyframes ds-word-hand{0%,100%{transform:rotate(0) translateY(0)}38%{transform:rotate(-4deg) translateY(-1px)}}
@@ -727,6 +727,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // This follows word timing, not phoneme-level audio analysis.
         const syllables=(spokenWord.match(/[аоуыэяёюеи]/giu)||[]).length;
         const mouthBeats=Math.max(1,Math.min(3,syllables,Math.floor(mouthDuration/.16)));
+        // Match the head/hand gesture to each spoken word, rather than using a fixed 270ms nod.
+        character.style.setProperty('--ds-word-gesture-duration',Math.max(.23,Math.min(.4,mouthDuration)).toFixed(2)+'s');
         mouth.style.setProperty('--ds-mouth-iterations',String(mouthBeats));
         mouth.style.setProperty('--ds-mouth-duration',(mouthDuration/mouthBeats).toFixed(2)+'s');
         const vowel=spokenWord?.match(/[аоуыэяёюеи]/iu)?.[0]?.toLowerCase();
