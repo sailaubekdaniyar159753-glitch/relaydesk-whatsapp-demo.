@@ -308,6 +308,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   const chipsMap=[['🎮 Мини-игры','games'],['🤖 Боты','bots'],['🌐 Сайты','sites'],['🎨 Дизайн','design'],['🎬 Видео','video'],['💰 Цена','price']];
   for (const [label,key] of chipsMap){const b=make('button','',label);b.type='button';b.addEventListener('click',()=>respond(label,text[key]));chips.appendChild(b)}
   function classify(q){
+    // Ignore greetings and polite lead-ins only when matching a general services question.
+    // Price, deadlines and specific service requests still use the untouched original text.
+    const serviceQuery=q.trim().replace(/^(?:(?:здравствуйте|здравствуй|привет|добрый\s+(?:день|вечер|утро)|hello|hi|подскажите|скажите|пожалуйста)\s*[,!.\-–—]*\s*)+/iu,'').trim();
     const patterns=[
       ['price',/(цена|стоим|стоить|стоит|ценник|сколько\s+(?:стоит|будет\s+стоить|денег|тенге|за(?:\s|$))|оплат|бюджет|прайс|тенге|тг(?:\s|$))/i],
       ['time',/(срок|когда|дней|часов|(?:^|[^\p{L}])врем(?:я|ени|енем|енах|ена)(?=$|[^\p{L}])|длит|займ[её]т)/iu],
@@ -464,12 +467,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(!siteIntent && /(?:^|[^\p{L}])(?:ии|ai)[-\s]?(?:бот\p{L}*|чат[-\s]?бот\p{L}*|chatbot|ассистент\p{L}*|помощник\p{L}*|консультант\p{L}*)|(?:голосов\p{L}*|виртуальн\p{L}*|умн\p{L}*)\s+(?:ассистент|помощник|консультант)\p{L}*|(?:^|[^\p{L}])chatbot(?=$|[^\p{L}])|чат\s+с\s+(?:ии|ai)(?=$|[^\p{L}])/iu.test(q))return 'bots';
     // Broad service enquiries need a useful overview, not an unrelated fallback.
     // Anchor the wording to avoid overriding specific site, bot, design or price requests.
-    if(/^(?:какие\s+(?:(?:у\s+вас)\s+)?(?:есть\s+)?(?:услуги|направления)(?:\s+вы\s+(?:предлагаете|оказываете|предоставляете))?|какие\s+(?:услуги|направления)\s+у\s+вас\s+есть|что\s+вы\s+(?:умеете|можете\s+(?:сделать|предложить))|чем\s+(?:вы\s+)?занимаетесь|расскажите\s+(?:о|об|про)\s+(?:(?:ваших?|своих?)\s+)?(?:услугах|услуги|направлениях|направления)|что\s+вы\s+(?:делаете|предлагаете)|чем\s+занимается\s+(?:densai(?:\s+studio)?|ваша\s+студия))\s*[?!.]*$/iu.test(q.trim()))return 'services';
+    if(/^(?:какие\s+(?:(?:у\s+вас)\s+)?(?:есть\s+)?(?:услуги|направления)(?:\s+вы\s+(?:предлагаете|оказываете|предоставляете))?|какие\s+(?:услуги|направления)\s+у\s+вас\s+есть|что\s+вы\s+(?:умеете|можете\s+(?:сделать|предложить))|чем\s+(?:вы\s+)?занимаетесь|расскажите\s+(?:о|об|про)\s+(?:(?:ваших?|своих?)\s+)?(?:услугах|услуги|направлениях|направления)|что\s+вы\s+(?:делаете|предлагаете)|чем\s+занимается\s+(?:densai(?:\s+studio)?|ваша\s+студия))\s*[?!.]*$/iu.test(serviceQuery))return 'services';
     // Natural questions about the studio's overall offer should not fall through to a generic answer.
     // Match complete enquiries only; specific services, estimates and portfolio keep their priority.
-    if(/^(?:какие\s+(?:услуги|направления)\s+(?:есть\s+)?(?:у\s+)?(?:densai(?:\s+studio)?|вашей\s+студии)|расскажите\s+(?:о|об|про)\s+(?:услугах|направлениях|направления)\s+(?:вашей\s+студии|densai(?:\s+studio)?)|что\s+вы\s+предлагаете\s+(?:клиентам|заказчикам)|что\s+умеет\s+ваш\s+(?:помощник|ассистент)|чем\s+вы\s+можете\s+помочь)\s*[?!.]*$/iu.test(q.trim()))return 'services';
+    if(/^(?:какие\s+(?:услуги|направления)\s+(?:есть\s+)?(?:у\s+)?(?:densai(?:\s+studio)?|вашей\s+студии)|расскажите\s+(?:о|об|про)\s+(?:услугах|направлениях|направления)\s+(?:вашей\s+студии|densai(?:\s+studio)?)|что\s+вы\s+предлагаете\s+(?:клиентам|заказчикам)|что\s+умеет\s+ваш\s+(?:помощник|ассистент)|чем\s+вы\s+можете\s+помочь)\s*[?!.]*$/iu.test(serviceQuery))return 'services';
     // Polite service enquiries and studio capability questions should show the overview.
-    if(/^(?:расскажите\s*,?\s*пожалуйста\s*,?\s*(?:о|об|про)\s+(?:(?:ваших?|своих)\s+)?(?:услугах|услуги|направлениях)|что\s+(?:умеет|может)\s+densai(?:\s+studio)?)\s*[?!.]*$/iu.test(q.trim()))return 'services';
+    if(/^(?:расскажите\s*,?\s*пожалуйста\s*,?\s*(?:о|об|про)\s+(?:(?:ваших?|своих)\s+)?(?:услугах|услуги|направлениях)|что\s+(?:умеет|может)\s+densai(?:\s+studio)?)\s*[?!.]*$/iu.test(serviceQuery))return 'services';
     const found=patterns.find(([key,re])=>!(key==='bots'&&siteIntent&&!explicitBot)&&!(featureNotEstimate&&(key==='price'||key==='time'))&&!(adviceNotPrice&&key==='price')&&re.test(q));return found?found[0]:'default';
   }
   let replyGestureTimer=null;
