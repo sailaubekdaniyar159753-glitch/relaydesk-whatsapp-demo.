@@ -303,6 +303,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     time:'⏱ Срок зависит от сложности. Простой визуал и крупный проект занимают разное время — обсудим задачу и согласуем реальные сроки.',
     greeting:'Привет! 👋 Я DenSai. Могу рассказать о сайтах, мини-играх, чат-ботах, дизайне и видеомонтаже. Что вас интересует?',
     thanks:'Пожалуйста! 😊 Если понадобится помощь с проектом, напишите, что хотите создать, или свяжитесь с автором через @Densai10.',
+    hours:'График работы и часы ответа DenSai Studio не опубликованы. Напишите в Telegram @Densai10 — согласуем удобное время связи.',
     default:'Я обычный помощник DenSai, поэтому не буду придумывать ответ 🙂 Могу рассказать о сайтах, мини-играх, ботах, дизайне, монтаже и стоимости. Для индивидуального вопроса напишите @Densai10.'
   };
   const chipsMap=[['🎮 Мини-игры','games'],['🤖 Боты','bots'],['🌐 Сайты','sites'],['🎨 Дизайн','design'],['🎬 Видео','video'],['💰 Цена','price']];
@@ -364,6 +365,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       if(/(?:скин(?:ьте|ь)|пришл(?:ите|и)|дайте|отправ(?:ьте|ь))\s+(?:(?:мне|пожалуйста)\s+)?(?:ваш\s+сайт|сайт\s+(?:студии|densai)|сайт\s+вашей\s+студии)(?=$|[^\p{L}])/iu.test(q))return 'portfolio';
       if(/(?:как|где)\s+(?:мне\s+)?(?:вас|тебя|студию|densai)\s+(?:найти|отыскать|искать|разыскать)(?=$|[^\p{L}])|(?:как|где)\s+(?:мне\s+)?(?:найти|отыскать|искать)\s+(?:вас|тебя|студию|densai)(?=$|[^\p{L}])|(?:можно|могу|хочу|можем)\s+(?:(?:ли|я|мы)\s+){0,2}(?:заказать|запланировать|назначить)\s+(?:звонок|созвон|консультацию)(?=$|[^\p{L}])/iu.test(q))return 'contact';
     }
+    // Working-hours questions are about contacting the studio, not portfolio or delivery time.
+    // Do not capture briefs for a website or chatbot with its own work schedule.
+    if(!siteIntent&&!explicitBot&&/(?:график|режим)\s+работы|рабоч(?:ее|ие)\s+время|(?:в\s+какое\s+время|в\s+какие\s+часы|по\s+какому\s+графику)\s+(?:вы\s+)?работаете|(?:вы\s+)?работаете\s+(?:(?:ли\s+)?(?:вы\s+)?)?(?:по\s+выходным|в\s+выходные|в\s+субботу|в\s+воскресенье|ночью|вечером)|(?:на\s+связи|доступны)\s+(?:ли\s+)?(?:по\s+выходным|в\s+выходные|вечером|ночью)/iu.test(q))return 'hours';
     const priority=asksPrice?'price':asksTime?'time':featureNotEstimate?null:(!adviceNotPrice&&patterns.find(([key])=>key==='price')[1].test(q))?'price':patterns.find(([key])=>key==='time')[1].test(q)?'time':null;
     if(priority)return priority;
     // Direct enquiries about contacting us or leaving a lead are not bot/CRM orders.
