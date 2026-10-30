@@ -524,13 +524,20 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide','ds-speech-paused');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if(speechOwnsUtterance&&'speechSynthesis' in window){speechOwnsUtterance=false;try{speechSynthesis.cancel()}catch(e){}}}
+  // Both sound controls must reflect the same state, including voice-engine failures.
+  function syncSoundButtons(failed=false){
+    const label=muted?'Включить звук':'Отключить звук';
+    for(const control of [sound,headerSound]){
+      control.textContent=muted?'🔇':'🔊';
+      control.setAttribute('aria-label',label);
+      control.setAttribute('aria-pressed',String(!muted));
+      control.title=failed?'Озвучка не сработала. Нажмите, чтобы попробовать снова':label;
+    }
+  }
   function reportSpeechFailure(){
     clearSpeechMotion();
     muted=true;
-    sound.textContent='🔇';
-    sound.setAttribute('aria-label','Включить звук');
-    sound.setAttribute('aria-pressed','false');
-    sound.title='Озвучка не сработала. Нажмите, чтобы попробовать снова';
+    syncSoundButtons(true);
     hint.textContent='Озвучка недоступна. Попробуй ещё раз 🔇';
   }
   function say(s){
@@ -825,7 +832,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(!next&&speechOwnsUtterance&&!muted&&!document.hidden&&speechSynthesis.speaking&&!speechSynthesis.paused)character.classList.add('ds-speaking');
     minimize.textContent=next?'+':'−';minimize.setAttribute('aria-label',next?'Развернуть персонажа':'Свернуть персонажа');minimize.setAttribute('aria-expanded',String(!next));
   });character.addEventListener('click',poke);open.addEventListener('click',()=>{lastChatOpener=open;toggle()});exit.addEventListener('click',()=>toggle(false));
-  const toggleSound=()=>{if(!voiceSupported)return;muted=!muted;for(const control of [sound,headerSound]){control.textContent=muted?'🔇':'🔊';control.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');control.setAttribute('aria-pressed',String(!muted));control.title=muted?'Включить звук':'Отключить звук';}if(muted)stopSpeech();else say(lastReplyText)};sound.addEventListener('click',toggleSound);headerSound.addEventListener('click',toggleSound);
+  const toggleSound=()=>{if(!voiceSupported)return;muted=!muted;syncSoundButtons();if(muted)stopSpeech();else say(lastReplyText)};sound.addEventListener('click',toggleSound);headerSound.addEventListener('click',toggleSound);
   // IME candidates can finish composition just before Enter reaches keydown (Safari).
   // Ignore that confirming Enter, but allow a normal Enter shortly afterward.
   let composingMessage=false, lastCompositionEnd=-Infinity, lastExplicitSend=-Infinity;
