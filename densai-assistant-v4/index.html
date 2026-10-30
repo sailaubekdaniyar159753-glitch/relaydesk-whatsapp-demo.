@@ -362,7 +362,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(siteIntent&&!asksPrice&&!asksTime&&!explicitBot&&/(?:оплат|заплат|перевест)/iu.test(serviceQuery)&&(/на\s+(?:мо[её]м|нашем)\s+сайт\p{L}*/iu.test(serviceQuery)||/^(?:сделайте|подключите|настройте|внедрите|реализуйте)\s+(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*(?:\s+[^.!?]{0,60})?\s+на\s+сайт\p{L}*\s*[?!.]*$/iu.test(serviceQuery)))return 'sites';
     // Paying FOR an order on the studio website is not a request to BUILD checkout.
     // Keep this narrowly anchored: "подключить оплату на сайте" is still a site brief.
-    if(!asksPrice&&!asksTime&&!explicitBot&&/^(?:(?:как|где|куда)\s+(?:мне\s+)?(?:оплатить|заплатить|перевести)|(?:можно|могу)\s+(?:ли\s+)?(?:оплатить|заплатить))\s+(?:(?:заказ|услуги|работу)\s+)?(?:(?:через|по|на)\s+)?(?:kaspi|каспи|карт\p{L}*|qr(?:[-\s]?код\p{L}*)?)\s+на\s+(?:(?:вашем|этом)\s+)?сайт\p{L}*\s*[?!.]*$/iu.test(serviceQuery))return 'payment';
+    if(!asksPrice&&!asksTime&&!explicitBot&&/^(?:(?:как|где|куда)\s+(?:мне\s+)?(?:оплатить|заплатить|перевести)|(?:можно|могу)\s+(?:ли\s+)?(?:оплатить|заплатить))\s+(?:(?:заказ|услуги|работу)\s+)?(?:(?:через|по|на)\s+)?(?:kaspi|каспи|карт\p{L}*|qr(?:[-\s]?код\p{L}*)?)\s+на\s+(?:(?:вашем|этом)\s+)?сайт\p{L}*(?:\s+(?:densai(?:\s+studio)?|студии))?\s*[?!.]*$/iu.test(serviceQuery))return 'payment';
     // Direct requests to message DenSai or talk to a person are contact enquiries,
     // not orders to build a WhatsApp/Telegram bot.
     if(!explicitBot&&!asksPrice&&!asksTime&&(
