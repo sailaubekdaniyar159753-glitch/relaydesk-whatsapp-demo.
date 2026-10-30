@@ -110,6 +110,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-open{background:linear-gradient(105deg,#0875c8,#03bcf4);border:1px solid #8cf3ff;border-radius:22px;padding:10px 15px;white-space:nowrap;font-weight:750;font-size:12px;box-shadow:0 3px 19px #0abfff99;color:white}
 #densai-helper-root .ds-sound{background:#112e48e8;border:1px solid #346784;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;font-size:16px;padding:0}
 #densai-helper-root .ds-sound:disabled{opacity:.55;cursor:not-allowed}
+#densai-helper-root .ds-head-sound{flex:none}
 #densai-helper-root .ds-window{pointer-events:auto;display:none;position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));right:clamp(190px,calc(1.8vw + 175px),220px);width:min(365px,calc(100vw - 24px));max-height:min(590px,calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));overflow:hidden;flex-direction:column;background:#09182af7;color:#eefaff;border:1px solid #47c9ff;border-radius:20px;box-shadow:0 20px 55px #000c,0 0 20px #04c3ff25;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
 #densai-helper-root .ds-window[data-open="true"]{display:flex;animation:ds-panel-in .2s ease-out}
 #densai-helper-root .ds-head{display:flex;gap:9px;align-items:center;padding:13px 14px;border-bottom:1px solid #234960}
@@ -235,7 +236,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   const panel=make('section','ds-window');panel.id='densai-dialog';panel.dataset.open='false';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Чат с помощником DenSai');
   const head=make('div','ds-head'),avatar=make('img','ds-avatar');avatar.src=assets.poster;avatar.alt='';
   const heading=make('div','ds-heading');heading.append(make('strong','','DenSai · помощник'),make('small','','На связи · бесплатная консультация'));
-  const exit=make('button','ds-exit','×');exit.type='button';exit.setAttribute('aria-label','Закрыть чат');head.append(avatar,heading,exit);
+  const exit=make('button','ds-exit','×');exit.type='button';exit.setAttribute('aria-label','Закрыть чат');const headerSound=make('button','ds-sound ds-head-sound','🔇');headerSound.type='button';headerSound.disabled=!voiceSupported;headerSound.setAttribute('aria-label',voiceSupported?'Включить звук':'Озвучивание недоступно');headerSound.setAttribute('aria-pressed','false');headerSound.title=voiceSupported?'Включить звук':'Озвучивание недоступно в этом браузере';head.append(avatar,heading,headerSound,exit);
   const conversation=make('div','ds-conversation');conversation.setAttribute('role','log');conversation.setAttribute('aria-live','polite');
   const chips=make('div','ds-picks');
   const form=make('form','ds-form');const input=make('input','ds-question');input.type='text';input.placeholder='Напишите ваш вопрос…';input.maxLength=400;input.required=true;input.setAttribute('aria-label','Сообщение помощнику DenSai');
@@ -824,7 +825,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(!next&&speechOwnsUtterance&&!muted&&!document.hidden&&speechSynthesis.speaking&&!speechSynthesis.paused)character.classList.add('ds-speaking');
     minimize.textContent=next?'+':'−';minimize.setAttribute('aria-label',next?'Развернуть персонажа':'Свернуть персонажа');minimize.setAttribute('aria-expanded',String(!next));
   });character.addEventListener('click',poke);open.addEventListener('click',()=>{lastChatOpener=open;toggle()});exit.addEventListener('click',()=>toggle(false));
-  sound.addEventListener('click',()=>{if(!voiceSupported)return;muted=!muted;sound.textContent=muted?'🔇':'🔊';sound.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');sound.setAttribute('aria-pressed',String(!muted));sound.title=muted?'Включить звук':'Отключить звук';if(muted)stopSpeech();if(!muted)say(lastReplyText)});
+  const toggleSound=()=>{if(!voiceSupported)return;muted=!muted;for(const control of [sound,headerSound]){control.textContent=muted?'🔇':'🔊';control.setAttribute('aria-label',muted?'Включить звук':'Отключить звук');control.setAttribute('aria-pressed',String(!muted));control.title=muted?'Включить звук':'Отключить звук';}if(muted)stopSpeech();else say(lastReplyText)};sound.addEventListener('click',toggleSound);headerSound.addEventListener('click',toggleSound);
   // IME candidates can finish composition just before Enter reaches keydown (Safari).
   // Ignore that confirming Enter, but allow a normal Enter shortly afterward.
   let composingMessage=false, lastCompositionEnd=-Infinity, lastExplicitSend=-Infinity;
