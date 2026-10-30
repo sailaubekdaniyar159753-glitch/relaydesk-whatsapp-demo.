@@ -507,7 +507,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   function respond(question,response){addBubble(question,'guest');addBubble(response);lastReplyText=response;acknowledgeReply();if(!muted)say(response);}
   addBubble('Привет! 👋 Я помощник DenSai Studio. Расскажу об услугах или помогу связаться с разработчиком. Что интересует?');
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
-  let hits=0, animationTimer=null;
+  let hits=0, animationTimer=null, hintTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
   let speechToken=0, speechOwnsUtterance=false, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, speechEndTimer=null, speechPauseTimer=null, speechHealthTimer=null, speechInactiveChecks=0, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
   function clearSpeechMotion(){
@@ -792,7 +792,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   }
   function reset(){character.classList.remove('ds-hit');character.classList.add('ds-idle')}
   // A tap can animate the mascot without cutting off an answer already being read aloud.
-  function poke(){hits++;clearTimeout(animationTimer);character.classList.remove('ds-idle','ds-hit');void character.offsetWidth;character.classList.add('ds-hit');const line=lines[(hits-1)%lines.length];hint.textContent=line;if(!speechOwnsUtterance)say(line);animationTimer=setTimeout(()=>{reset();if(hint.textContent===line)hint.textContent='Нажми ещё 😄'},1450)}
+  function poke(){hits++;clearTimeout(animationTimer);clearTimeout(hintTimer);character.classList.remove('ds-idle','ds-hit');void character.offsetWidth;character.classList.add('ds-hit');const line=lines[(hits-1)%lines.length];hint.textContent=line;if(!speechOwnsUtterance)say(line);animationTimer=setTimeout(reset,760);hintTimer=setTimeout(()=>{if(hint.textContent===line)hint.textContent='Нажми ещё 😄'},1450)}
   let lastChatOpener=open;
   // Closing the dialog should not focus a hero button that has scrolled off-screen.
   function visibleChatOpener(){
@@ -810,6 +810,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // Hide transient gestures without cancelling speech or its safety watchdogs.
       clearTimeout(replyGestureTimer);replyGestureTimer=null;
       clearTimeout(animationTimer);animationTimer=null;
+      clearTimeout(hintTimer);hintTimer=null;hint.textContent='Привет! 👋 Тыкни на меня!';
       clearTimeout(speechBeatTimer);speechBeatTimer=null;
       clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
       character.classList.remove('ds-ack','ds-hit','ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
@@ -854,6 +855,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     stopSpeech();
     clearTimeout(replyGestureTimer);
     clearTimeout(animationTimer);
+    clearTimeout(hintTimer);
     character.classList.remove('ds-ack');
     reset();
     hint.textContent='Привет! 👋 Тыкни на меня!';
