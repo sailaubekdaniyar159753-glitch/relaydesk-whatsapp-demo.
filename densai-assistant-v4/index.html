@@ -92,11 +92,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
    Poster is 300x542: visible lips are near y=151 (~27.8%), not at 32.5% (neck).
    Word boundaries drive short openings; unsupported voices use a gentle fallback. */
 #densai-helper-root .ds-mouth{position:absolute;left:50%;top:27.8%;width:5.8%;height:2.0%;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#4c2820 0%,#25120f 75%);transform:translate(-50%,-50%) scaleY(0);opacity:0;transform-origin:center}
-#densai-helper-root .ds-person.ds-speaking:not(.ds-hit):not(.ds-word-mode) .ds-mouth{animation:ds-mouth-talk .38s ease-in-out infinite}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse:not(.ds-hit) .ds-mouth{animation:ds-mouth-talk var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
+#densai-helper-root .ds-person.ds-speaking:not(.ds-word-mode) .ds-mouth{animation:ds-mouth-talk .38s ease-in-out infinite}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse .ds-mouth{animation:ds-mouth-talk var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
 /* Approximate the first vowel of a spoken word; do not replace the original face artwork. */
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-round:not(.ds-hit) .ds-mouth{animation:ds-mouth-round var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-wide:not(.ds-hit) .ds-mouth{animation:ds-mouth-wide var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-round .ds-mouth{animation:ds-mouth-round var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-wide .ds-mouth{animation:ds-mouth-wide var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
 @keyframes ds-mouth-round{0%,100%{transform:translate(-50%,-50%) scale(.7,0);opacity:0}42%{transform:translate(-50%,-50%) scale(.7,1.45);opacity:.88}72%{transform:translate(-50%,-50%) scale(.72,.5);opacity:.65}}
 @keyframes ds-mouth-wide{0%,100%{transform:translate(-50%,-50%) scale(1.35,0);opacity:0}42%{transform:translate(-50%,-50%) scale(1.4,.7);opacity:.88}72%{transform:translate(-50%,-50%) scale(1.25,.3);opacity:.65}}
 @media(max-height:560px){#densai-helper-root .ds-mouth{width:3.6%}}
