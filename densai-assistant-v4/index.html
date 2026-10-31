@@ -393,6 +393,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Paying FOR an order on the studio website is not a request to BUILD checkout.
     // Keep this narrowly anchored: "подключить оплату на сайте" is still a site brief.
     if(!asksPrice&&!asksTime&&!explicitBot&&/^(?:(?:как|где|куда)\s+(?:мне\s+)?(?:оплатить|заплатить|перевести)|(?:можно|могу)\s+(?:ли\s+)?(?:оплатить|заплатить))\s+(?:(?:заказ|услуги|работу)\s+)?(?:(?:через|по|на)\s+)?(?:kaspi|каспи|карт\p{L}*|qr(?:[-\s]?код\p{L}*)?)\s+на\s+(?:(?:вашем|этом)\s+)?сайт\p{L}*(?:\s+(?:densai(?:\s+studio)?|студии))?\s*[?!.]*$/iu.test(serviceQuery))return 'payment';
+
+    // Bank-transfer questions ask how to pay DenSai, not for a quote or contact number.
+    // Require the whole question so client checkout briefs retain their service route.
+    if(!asksPrice&&!asksTime&&!explicitBot&&/^(?:куда|на\s+какие\s+реквизиты|на\s+какую\s+карту|на\s+какой\s+номер(?:\s+(?:kaspi|каспи))?)\s+(?:мне\s+)?(?:перевести|отправить|скинуть)\s+(?:вам\s+)?(?:деньги|оплату|предоплату)(?:\s+(?:за\s+(?:заказ|услуги|работу|сайт|разработку\s+сайта)|вам))?\s*[?!.]*$/iu.test(serviceQuery))return 'payment';
+
     // Direct requests to message DenSai or talk to a person are contact enquiries,
     // not orders to build a WhatsApp/Telegram bot.
     if(!explicitBot&&!asksPrice&&!asksTime&&(
