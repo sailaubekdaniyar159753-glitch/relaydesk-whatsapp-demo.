@@ -597,7 +597,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // Some voices emit a new word boundary but keep charIndex frozen at zero.
       // Track the next text word in that case instead of repeating the first mouth shape.
       const makeMouthWordTracker=(text)=>{
-        const words=[...text.matchAll(/[\p{L}\p{N}-]+/gu)];
+        const words=[...text.matchAll(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu)];
         let current=-1,previousOffset=-1,relativeOffsets=false;
         return (offset)=>{
           if(!words.length)return '';
