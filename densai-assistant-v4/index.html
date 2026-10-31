@@ -342,7 +342,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Troubleshooting the on-page mascot, not commissioning a new animated character.
     if(/^(?:почему\s+)?(?:(?:у\s+(?:него|персонажа|помощника)\s+)?рот\s+не\s+(?:двигается|открывается)|не\s+(?:двигается|открывается)\s+рот)\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
     // Natural mobile chat and voice-control questions must not be mistaken for sales contacts.
-    if(/^(?:как\s+(?:мне\s+)?(?:закрыть|открыть)\s+чат\s+на\s+(?:телефоне|экране)|(?:почему\s+)?не\s+работает\s+кнопка\s+(?:отправить|отправки)|как\s+(?:мне\s+)?(?:поменять|изменить|выбрать)\s+голос\s+помощника)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
+    if(/^(?:как\s+(?:мне\s+)?(?:закрыть|открыть)\s+чат\s+на\s+(?:телефоне|экране)|(?:почему\s+)?не\s+работает\s+кнопка\s+(?:отправить|отправки)|как\s+(?:мне\s+)?(?:поменять|изменить|выбрать)\s+голос\s+(?:(?:у|для)\s+)?(?:помощника|персонажа|денсая|densai)|можно\s+ли\s+(?:поменять|изменить|выбрать)\s+голос\s+(?:(?:у|для)\s+)?(?:помощника|персонажа|денсая|densai))\s*[?!.]*$/iu.test(serviceQuery))return 'help';
     // Common short questions about the visible mascot and its chat controls.
     // Match the complete enquiry: a client's order for a talking mascot is not widget help.
     if(/^(?:почему\s+рот\s+не\s+открывается\s+при\s+озвучке|как\s+(?:мне\s+)?(?:спрятать|закрыть)\s+персонажа|как\s+(?:мне\s+)?закрыть\s+помощника|персонаж\s+перекрывает\s+кнопку\s+на\s+телефоне)\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
