@@ -823,7 +823,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           character.classList.add('ds-speech-paused');
           // Bound this otherwise untracked wait, and clear it when speech actually begins.
           speechPauseTimer=setTimeout(()=>{
-            if(token!==speechToken||muted||document.hidden)return;
+            if(token!==speechToken||muted||document.hidden||!speechSynthesis.paused)return;
             stopSpeech();
             hint.textContent='Озвучка остановлена: голосовой движок не начал ответ после паузы.';
           },90000);
