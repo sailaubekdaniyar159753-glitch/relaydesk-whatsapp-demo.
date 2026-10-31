@@ -759,7 +759,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           character.classList.remove('ds-word-pulse','ds-word-left','ds-hand-pulse');
           // Recover continuous fallback only if the voice stops reporting word boundaries.
           speechFallbackTimer=setTimeout(()=>{
-            if(token===speechToken&&character.classList.contains('ds-speaking'))character.classList.remove('ds-word-mode');
+            if(token===speechToken&&character.classList.contains('ds-speaking')&&!speechPaused&&!speechSynthesis.paused&&speechSynthesis.speaking&&!muted&&!document.hidden&&root.dataset.minimized!=='true')character.classList.remove('ds-word-mode');
           },1600);
         },700);
         if(now-lastWordBeat<160)return;
