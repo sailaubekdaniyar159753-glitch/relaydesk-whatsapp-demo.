@@ -593,7 +593,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(!speechOwnsUtterance&&(speechSynthesis.speaking||speechSynthesis.pending)){hint.textContent='В браузере уже идёт или ожидает озвучка. Попробуй ещё раз позже 🔊';return;}
     stopSpeech();lastWordBeat=-Infinity;wordHandLeft=false;wordBoundaryCount=0;lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;const token=speechToken;
     try{
-      const spoken=s.replace(/https?:\/\/[^\s]+/gi,'ссылка есть в чате').replace(/[^\p{L}\p{N}\s!?,.:;\-]/gu,'').replace(/\s+/g,' ').replace(/\s+\./g,'.').trim();
+      const spoken=s.replace(/https?:\/\/[^\s]+/gi,'ссылка есть в чате').replace(/[^\p{L}\p{N}\s!?,.:;\-]/gu,' ').replace(/\s+/g,' ').replace(/\s+\./g,'.').trim();
       // Some voices emit a new word boundary but keep charIndex frozen at zero.
       // Track the next text word in that case instead of repeating the first mouth shape.
       const makeMouthWordTracker=(text)=>{
