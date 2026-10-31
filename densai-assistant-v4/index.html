@@ -387,6 +387,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const adviceNotPrice=/(?:^|[^\p{L}])(?:стоит\s+ли|не\s+стоит)(?=$|[^\p{L}])/iu.test(q) && !/(?:цена|стоим|ценник|сколько|оплат|бюджет|прайс|тенге|тг(?:\s|$))/iu.test(q);
     // A customer implementing checkout on THEIR site is ordering a website feature.
     if(siteIntent&&!asksPrice&&!asksTime&&!explicitBot&&/(?:оплат|заплат|перевест)/iu.test(serviceQuery)&&(/на\s+(?:мо[её]м|нашем)\s+сайт\p{L}*/iu.test(serviceQuery)||/^(?:сделайте|подключите|настройте|внедрите|реализуйте)\s+(?:онлайн[-\s]?)?(?:пред)?оплат\p{L}*(?:\s+[^.!?]{0,60})?\s+на\s+сайт\p{L}*\s*[?!.]*$/iu.test(serviceQuery)))return 'sites';
+    // Paying DenSai for a website is a payment-method question, not a quote.
+    // Require an explicit payment verb and the whole question; integration briefs stay in sites.
+    if(!asksPrice&&!asksTime&&!explicitBot&&/^(?:(?:как|где|куда)\s+(?:мне\s+)?(?:оплатить|заплатить)\s+(?:(?:ваш|за)\s+)?(?:сайт|разработку\s+сайта)(?:\s+(?:у\s+вас|через\s+(?:kaspi|каспи)))?|(?:можно|могу)\s+(?:ли\s+)?оплатить\s+(?:ваш\s+)?сайт\s+(?:через\s+)?(?:kaspi|каспи))\s*[?!.]*$/iu.test(serviceQuery))return 'payment';
     // Paying FOR an order on the studio website is not a request to BUILD checkout.
     // Keep this narrowly anchored: "подключить оплату на сайте" is still a site brief.
     if(!asksPrice&&!asksTime&&!explicitBot&&/^(?:(?:как|где|куда)\s+(?:мне\s+)?(?:оплатить|заплатить|перевести)|(?:можно|могу)\s+(?:ли\s+)?(?:оплатить|заплатить))\s+(?:(?:заказ|услуги|работу)\s+)?(?:(?:через|по|на)\s+)?(?:kaspi|каспи|карт\p{L}*|qr(?:[-\s]?код\p{L}*)?)\s+на\s+(?:(?:вашем|этом)\s+)?сайт\p{L}*(?:\s+(?:densai(?:\s+studio)?|студии))?\s*[?!.]*$/iu.test(serviceQuery))return 'payment';
