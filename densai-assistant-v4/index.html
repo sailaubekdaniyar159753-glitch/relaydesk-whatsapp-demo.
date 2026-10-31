@@ -543,7 +543,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     replyGestureTimer=setTimeout(()=>character.classList.remove('ds-ack'),720);
   }
   let lastReplyText='Привет! Я DenSai!';
-  function respond(question,response){addBubble(question,'guest');addBubble(response);lastReplyText=response;acknowledgeReply();if(!muted)say(response);}
+  function respond(question,response){formError.textContent='';formError.hidden=true;input.removeAttribute('aria-invalid');addBubble(question,'guest');addBubble(response);lastReplyText=response;acknowledgeReply();if(!muted)say(response);}
   addBubble('Привет! 👋 Я помощник DenSai Studio. Расскажу об услугах или помогу связаться с разработчиком. Что интересует?');
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null, hintTimer=null;
