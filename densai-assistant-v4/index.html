@@ -232,6 +232,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   const armRight=make('img','ds-arm ds-arm-right');armRight.alt='';armRight.src=mascotFrame();
   for(const el of [base,headLayer,armLeft,armRight]){el.onerror=()=>{if(el.src!==assets.poster)el.src=assets.poster}}
   const refreshMotionFrames=()=>{const frame=mascotFrame();for(const el of [base,headLayer,armLeft,armRight]){if(el.src!==frame)el.src=frame}};
+  // Animated WebP does not honor CSS reduced-motion updates. Swap the original frames live.
+  if(typeof motionPreference.addEventListener==='function')motionPreference.addEventListener('change',refreshMotionFrames);
+  else if(typeof motionPreference.addListener==='function')motionPreference.addListener(refreshMotionFrames);
   if(typeof motionPreference.addEventListener==='function')motionPreference.addEventListener('change',refreshMotionFrames);
   else if(typeof motionPreference.addListener==='function')motionPreference.addListener(refreshMotionFrames);
   const mouth=make('span','ds-mouth');mouth.setAttribute('aria-hidden','true');const headGroup=make('span','ds-head-group');headGroup.append(headLayer,mouth);rig.append(base,armLeft,armRight,headGroup);
