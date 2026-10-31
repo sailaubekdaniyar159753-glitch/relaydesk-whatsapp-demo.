@@ -341,6 +341,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(/^(?:почему\s+)?(?:(?:у\s+(?:него|персонажа|помощника)\s+)?рот\s+не\s+(?:двигается|открывается)|не\s+(?:двигается|открывается)\s+рот)\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
     // Natural mobile chat and voice-control questions must not be mistaken for sales contacts.
     if(/^(?:как\s+(?:мне\s+)?(?:закрыть|открыть)\s+чат\s+на\s+(?:телефоне|экране)|(?:почему\s+)?не\s+работает\s+кнопка\s+(?:отправить|отправки)|как\s+(?:мне\s+)?(?:поменять|изменить|выбрать)\s+голос\s+помощника)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
+    // Common short questions about the visible mascot and its chat controls.
+    // Match the complete enquiry: a client's order for a talking mascot is not widget help.
+    if(/^(?:почему\s+рот\s+не\s+открывается\s+при\s+озвучке|как\s+(?:мне\s+)?(?:спрятать|закрыть)\s+персонажа|как\s+(?:мне\s+)?закрыть\s+помощника|персонаж\s+перекрывает\s+кнопку\s+на\s+телефоне)\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
+    if(/^(?:почему\s+(?:он\s+не\s+говорит\s+на\s+телефоне|персонаж\s+молчит|на\s+телефоне\s+нет\s+звука|не\s+отправляется\s+сообщение)|как\s+(?:мне\s+)?включить\s+звук\s+у\s+персонажа\s+на\s+телефоне|(?:не\s+работает\s+озвучка|не\s+отправляется\s+сообщение)(?:\s+на\s+телефоне)?)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
     const patterns=[
       ['price',/(цена|стоим|стоить|стоит|ценник|сколько\s+(?:стоит|будет\s+стоить|денег|тенге|за(?:\s|$))|оплат|бюджет|прайс|тенге|тг(?:\s|$))/i],
       ['time',/(срок|когда|дней|часов|(?:^|[^\p{L}])врем(?:я|ени|енем|енах|ена)(?=$|[^\p{L}])|длит|займ[её]т)/iu],
