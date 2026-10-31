@@ -783,15 +783,15 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         const mouthDuration=Math.max(.18,Math.min(.5,(.12+letters*.045)/u.rate));
         // Open the original mouth overlay once per syllable, with a minimum beat interval.
         // This follows word timing, not phoneme-level audio analysis.
-        const syllables=(spokenWord.match(/[аоуыэяёюеи]/giu)||[]).length;
+        const syllables=(spokenWord.match(/[аоуыэяёюеиaeiouy]/giu)||[]).length;
         const mouthBeats=Math.max(1,Math.min(3,syllables,Math.floor(mouthDuration/.16)));
         // Match the head/hand gesture to each spoken word, rather than using a fixed 270ms nod.
         character.style.setProperty('--ds-word-gesture-duration',Math.max(.23,Math.min(.4,mouthDuration)).toFixed(2)+'s');
         mouth.style.setProperty('--ds-mouth-iterations',String(mouthBeats));
         mouth.style.setProperty('--ds-mouth-duration',(mouthDuration/mouthBeats).toFixed(2)+'s');
-        const vowel=spokenWord?.match(/[аоуыэяёюеи]/iu)?.[0]?.toLowerCase();
-        character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёю]/u.test(vowel));
-        character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиы]/u.test(vowel));
+        const vowel=spokenWord?.match(/[аоуыэяёюеиaeiouy]/iu)?.[0]?.toLowerCase();
+        character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёюou]/u.test(vowel));
+        character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиыaeiy]/u.test(vowel));
         character.classList.add('ds-word-mode');
         character.classList.remove('ds-word-pulse');
         wordBoundaryCount++;
