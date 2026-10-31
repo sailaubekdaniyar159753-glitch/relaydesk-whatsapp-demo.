@@ -317,7 +317,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     default:'Я обычный помощник DenSai, поэтому не буду придумывать ответ 🙂 Могу рассказать о сайтах, мини-играх, ботах, дизайне, монтаже и стоимости. Для индивидуального вопроса напишите @Densai10.'
   };
   const chipsMap=[['🎮 Мини-игры','games'],['🤖 Боты','bots'],['🌐 Сайты','sites'],['🎨 Дизайн','design'],['🎬 Видео','video'],['💰 Цена','price']];
-  for (const [label,key] of chipsMap){const b=make('button','',label);b.type='button';b.addEventListener('click',()=>respond(label,text[key]));chips.appendChild(b)}
+  for (const [label,key] of chipsMap){const b=make('button','',label);b.type='button';b.addEventListener('click',()=>{respond(label,text[key]);if(!window.matchMedia('(pointer: coarse)').matches)input.focus({preventScroll:true})});chips.appendChild(b)}
   function classify(q){
     // Ignore greetings and polite lead-ins only when matching a general services question.
     // Price, deadlines and specific service requests still use the untouched original text.
