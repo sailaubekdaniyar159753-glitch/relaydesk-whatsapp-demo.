@@ -198,6 +198,10 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
  #densai-helper-root .ds-minimize{width:40px;height:40px;top:0}
  #densai-helper-root[data-minimized="true"] .ds-minimize{top:0}
 }
+
+/* Visible keyboard focus, including the chat input whose default outline is removed. */
+#densai-helper-root :is(button,a,input):focus-visible,
+#densai-try-assistant:focus-visible{outline:3px solid #ffe082;outline-offset:3px}
 </style></head>
 <body>
 <nav><a class="brand" href="https://densai-studio-kz-pro.vercel.app/">♛ Den<span>Sai</span><small>STUDIO</small></a><div class="menu"><a href="#services">Услуги</a><a href="https://densai-neon-hunt.vercel.app/">Мини-игра</a><a href="https://densai-studio-kz-pro.vercel.app/">Портфолио</a></div><a class="nav-cta" href="https://t.me/Densai10" target="_blank" rel="noopener">✈ Связаться</a></nav>
