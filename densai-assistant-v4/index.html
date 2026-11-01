@@ -107,7 +107,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-hit-star{position:absolute;right:2px;top:42px;color:#ffcd5a;opacity:0;font-size:28px;pointer-events:none}
 #densai-helper-root .ds-person.ds-hit:not(.ds-speech-paused) .ds-hit-star{animation:ds-star .65s ease-out}
 #densai-helper-root .ds-tools{display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:auto;margin-top:-7px;position:relative}
-#densai-helper-root .ds-open{background:linear-gradient(105deg,#0875c8,#03bcf4);border:1px solid #8cf3ff;border-radius:22px;padding:10px 15px;white-space:nowrap;font-weight:750;font-size:12px;box-shadow:0 3px 19px #0abfff99;color:white}
+#densai-helper-root .ds-open{background:linear-gradient(105deg,#0875c8,#03bcf4);border:1px solid #8cf3ff;border-radius:22px;min-height:44px;padding:10px 15px;white-space:nowrap;font-weight:750;font-size:12px;box-shadow:0 3px 19px #0abfff99;color:white}
 #densai-helper-root .ds-sound{background:#112e48e8;border:1px solid #346784;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;font-size:16px;padding:0}
 #densai-helper-root .ds-sound:disabled{opacity:.55;cursor:not-allowed}
 #densai-helper-root .ds-head-sound{flex:none}
@@ -196,8 +196,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 }
 /* Mobile: enlarge the collapse target without covering the original character. */
 @media(max-width:650px){
- #densai-helper-root .ds-character-shell{padding-top:40px}
- #densai-helper-root .ds-minimize{width:40px;height:40px;top:0}
+ #densai-helper-root .ds-character-shell{padding-top:44px}
+ #densai-helper-root .ds-minimize{width:44px;height:44px;top:0}
  #densai-helper-root[data-minimized="true"] .ds-minimize{top:0}
 }
 
