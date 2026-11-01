@@ -618,9 +618,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       // Track the next text word in that case instead of repeating the first mouth shape.
       const makeMouthWordTracker=(text)=>{
         const words=[...text.matchAll(/[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*/gu)];
-        let current=-1,previousOffset=-1,relativeOffsets=false;
-        return (offset)=>{
+        let current=-1,previousOffset=-1,relativeOffsets=false,justResumed=false;
+        const next=(offset)=>{
           if(!words.length)return '';
+          // The first boundary after resume may repeat the interrupted word.
+          // Do not mistake that replay for the next word when the offset is unchanged.
+          if(justResumed){justResumed=false;if(current>=0&&offset===previousOffset)return words[current][0];}
           if(offset>=text.length&&!relativeOffsets)current=words.length-1; // End-of-text boundary.
           else if(offset>=0&&offset<text.length&&offset!==previousOffset&&!relativeOffsets){
             // Some engines restart offsets at each sentence instead of using
@@ -640,6 +643,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           previousOffset=offset;
           return words[current]?.[0]||'';
         };
+        next.markResume=()=>{justResumed=true;};
+        return next;
       };
       const nextMouthWord=makeMouthWordTracker(spoken);
       const u=new SpeechSynthesisUtterance(spoken);u.lang='ru-RU';u.rate=1.08;u.pitch=1.1;
@@ -731,7 +736,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       const resumeSpeech=()=>{
         if(token!==speechToken||!speechSynthesis.speaking||speechSynthesis.paused||(!speechPaused&&speechStarted)||muted||document.hidden)return;
         // Resumed engines may restart word offsets and elapsedTime.
-        if(speechPaused){lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;lastWordBeat=-Infinity;}
+        if(speechPaused){lastBoundaryIndex=-1;lastBoundaryElapsed=-Infinity;lastBoundaryWall=-Infinity;lastWordBeat=-Infinity;nextMouthWord.markResume();}
         speechStarted=true;speechPaused=false;character.classList.remove('ds-speech-paused');clearTimeout(speechStartTimer);speechStartTimer=null;clearTimeout(speechPauseTimer);speechPauseTimer=null;
         if(root.dataset.minimized!=='true')character.classList.add('ds-speaking');keepSpeechAlive();
       };
