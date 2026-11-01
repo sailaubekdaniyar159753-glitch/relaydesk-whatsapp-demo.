@@ -623,7 +623,17 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           if(!words.length)return '';
           // The first boundary after resume may repeat the interrupted word.
           // Do not mistake that replay for the next word when the offset is unchanged.
-          if(justResumed){justResumed=false;if(current>=0&&offset===previousOffset)return words[current][0];}
+          if(justResumed){
+            justResumed=false;
+            // Resume can rewind from the middle to the beginning of the same word.
+            // Keep that word instead of treating the lower offset as a new sentence.
+            const activeWord=words[current];
+            if(activeWord&&(offset===previousOffset||
+              (offset>=activeWord.index&&offset<activeWord.index+activeWord[0].length))){
+              previousOffset=offset;
+              return activeWord[0];
+            }
+          }
           if(offset>=text.length&&!relativeOffsets)current=words.length-1; // End-of-text boundary.
           else if(offset>=0&&offset<text.length&&offset!==previousOffset&&!relativeOffsets){
             // Some engines restart offsets at each sentence instead of using
