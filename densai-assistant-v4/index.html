@@ -361,6 +361,13 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(/^(?:(?:почему\s+)?(?:(?:у\s+меня\s+)?(?:не\s+работает|не\s+открывается)\s+(?:этот\s+)?чат|(?:у\s+меня\s+)?(?:этот\s+)?чат\s+(?:не\s+работает|не\s+открывается|завис(?:ает)?))\s+на\s+телефоне|(?:почему\s+)?на\s+телефоне\s+(?:не\s+работает|не\s+открывается)\s+(?:этот\s+)?чат)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
     // Common mobile troubleshooting variants must not be routed as phone contacts.
     if(/^(?:(?:у\s+меня\s+)?на\s+телефоне\s+(?:чат\s+не\s+работает|не\s+работает\s+кнопка\s+отправить|нет\s+звука)|не\s+могу\s+отправить\s+сообщение\s+на\s+телефоне|чат\s+завис\s+на\s+телефоне)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
+    // Device-specific troubleshooting is about THIS widget, not a sales lead.
+    // Keep client projects (sites, apps, bots) and quotes on their normal routes.
+    const mobileDevice=/(?:^|[^\p{L}])(?:телефон\p{L}*|смартфон\p{L}*|айфон\p{L}*|iphone|android|андроид\p{L}*)(?=$|[^\p{L}])/iu;
+    const mobileSymptom=/(?:не\s+(?:работает|открывается|отправляется|слышно)|нет\s+звука|не\s+могу\s+отправить|завис\p{L}*|(?:включить|выключить|отключить)\s+(?:звук\p{L}*|озвучк\p{L}*|голос\p{L}*))/iu;
+    const mobileWidget=/(?:^|[^\p{L}])(?:чат|сообщени\p{L}*|звук\p{L}*|голос\p{L}*|озвучк\p{L}*)(?=$|[^\p{L}])/iu;
+    const clientProject=/(?:^|[^\p{L}])(?:сдела\p{L}*|созда\p{L}*|разработ\p{L}*|заказ\p{L}*|проект\p{L}*|сайт\p{L}*|приложен\p{L}*|бот\p{L}*|клиент\p{L}*)(?=$|[^\p{L}])|(?:мой|моя|моём|наш|нашем)\s+(?:чат|сайт|бот)/iu;
+    if(serviceQuery.length<=140&&mobileDevice.test(serviceQuery)&&mobileSymptom.test(serviceQuery)&&mobileWidget.test(serviceQuery)&&!clientProject.test(serviceQuery))return 'help';
     const patterns=[
       ['price',/(цена|стоим|стоить|стоит|ценник|сколько\s+(?:стоит|будет\s+стоить|денег|тенге|за(?:\s|$))|оплат|бюджет|прайс|тенге|тг(?:\s|$))/i],
       ['time',/(срок|когда|дней|часов|(?:^|[^\p{L}])врем(?:я|ени|енем|енах|ена)(?=$|[^\p{L}])|длит|займ[её]т)/iu],
