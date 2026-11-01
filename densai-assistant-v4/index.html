@@ -813,13 +813,16 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // A brief «в» or «к» must not keep the next vowel word's mouth closed.
         const vowels=(spokenWord.match(/[аоуыэяёюеиaeiouy]/giu)||[]).map(v=>v.toLowerCase());
         const syllables=vowels.length;
-        // Keep the mouth closed for the short consonant-only prepositions в, к and с.
-        character.classList.toggle('ds-mouth-closed',syllables===0&&/^[вкс]$/iu.test(spokenWord));
+        // Bilabial consonants (б/п/м, b/p/m) begin with closed lips.
+        // Hold that pose briefly before the first vowel, without changing the original art.
+        const bilabialOnset=syllables>0&&/^[бпмbpm]/iu.test(spokenWord);
+        character.classList.toggle('ds-mouth-closed',bilabialOnset||(syllables===0&&/^[вксбпм]$/iu.test(spokenWord)));
         const applyVowel=(vowel)=>{
+          character.classList.remove('ds-mouth-closed');
           character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёюou]/u.test(vowel));
           character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиыaeiy]/u.test(vowel));
         };
-        applyVowel(vowels[0]);
+        if(!bilabialOnset&&syllables>0)applyVowel(vowels[0]);
         // Every fresh word extends the inactivity window, even if its gesture is throttled.
         clearTimeout(speechFallbackTimer);
         speechFallbackTimer=setTimeout(()=>{
@@ -844,19 +847,24 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         character.classList.add('ds-mouth-pulse');
         // Change the mouth from one vowel shape to the next during a multi-syllable word.
         // Timers are cancelled by the next word, pause, stop or minimization.
-        if(mouthBeats>1){
-          const beatMs=Math.round(mouthDuration*1000/mouthBeats);
-          const nextVowel=(beat)=>{
-            speechVowelTimer=setTimeout(()=>{
-              speechVowelTimer=null;
-              if(token!==speechToken||speechPaused||muted||document.hidden||root.dataset.minimized==='true'||motionPreference.matches||speechSynthesis.paused||!speechSynthesis.speaking)return;
-              const index=Math.round(beat*(vowels.length-1)/(mouthBeats-1));
-              applyVowel(vowels[index]);
-              if(beat+1<mouthBeats)nextVowel(beat+1);
-            },beatMs);
-          };
-          nextVowel(1);
-        }
+        const beatMs=Math.round(mouthDuration*1000/mouthBeats);
+        const nextVowel=(beat)=>{
+          speechVowelTimer=setTimeout(()=>{
+            speechVowelTimer=null;
+            if(token!==speechToken||speechPaused||muted||document.hidden||root.dataset.minimized==='true'||motionPreference.matches||speechSynthesis.paused||!speechSynthesis.speaking)return;
+            const index=Math.round(beat*(vowels.length-1)/(mouthBeats-1));
+            applyVowel(vowels[index]);
+            if(beat+1<mouthBeats)nextVowel(beat+1);
+          },beatMs);
+        };
+        if(bilabialOnset){
+          speechVowelTimer=setTimeout(()=>{
+            speechVowelTimer=null;
+            if(token!==speechToken||speechPaused||muted||document.hidden||root.dataset.minimized==='true'||motionPreference.matches||speechSynthesis.paused||!speechSynthesis.speaking)return;
+            applyVowel(vowels[0]);
+            if(mouthBeats>1)nextVowel(1);
+          },Math.min(70,Math.round(mouthDuration*220)));
+        }else if(mouthBeats>1)nextVowel(1);
         if(now-lastWordBeat<160)return;
         lastWordBeat=now;
         // Head/hand motion is deliberately slower than the mouth.
