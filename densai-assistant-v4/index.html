@@ -620,7 +620,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         let current=-1,previousOffset=-1,relativeOffsets=false;
         return (offset)=>{
           if(!words.length)return '';
-          if(offset>=0&&offset<text.length&&offset!==previousOffset&&!relativeOffsets){
+          if(offset>=text.length&&!relativeOffsets)current=words.length-1; // End-of-text boundary.
+          else if(offset>=0&&offset<text.length&&offset!==previousOffset&&!relativeOffsets){
             // Some engines restart offsets at each sentence instead of using
             // absolute positions in the utterance. Never rewind the face to word one.
             if(previousOffset>=0&&offset<previousOffset){
@@ -630,7 +631,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
               const inside=words.findIndex(word=>word.index<=offset&&offset<word.index+word[0].length);
               // Word-end or separator offsets belong to the upcoming word, not the previous one.
               const found=inside>=0?inside:words.findIndex(word=>word.index>offset);
-              if(found>=current)current=found;
+              if(found<0)current=words.length-1; // Trailing punctuation belongs to the last word.
+              else if(found>=current)current=found;
               else current=Math.min(current+1,words.length-1);
             }
           }else current=Math.min(current+1,words.length-1);
