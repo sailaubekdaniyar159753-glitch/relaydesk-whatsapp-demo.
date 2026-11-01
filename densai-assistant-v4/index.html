@@ -97,12 +97,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 /* One-letter unvoiced Russian prepositions should not open the jaw. */
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-mouth-pulse.ds-mouth-closed .ds-mouth{animation:none;opacity:0;transform:translate(-50%,-50%) scaleY(0)}
 /* Approximate the first vowel of a spoken word; do not replace the original face artwork. */
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-mouth-pulse.ds-mouth-round .ds-mouth{animation:ds-mouth-round var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
-#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-mouth-pulse.ds-mouth-wide .ds-mouth{animation:ds-mouth-wide var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
-@keyframes ds-mouth-round{0%,100%{transform:translate(-50%,-50%) scale(.7,0);opacity:0}42%{transform:translate(-50%,-50%) scale(.7,1.45);opacity:.88}72%{transform:translate(-50%,-50%) scale(.72,.5);opacity:.65}}
-@keyframes ds-mouth-wide{0%,100%{transform:translate(-50%,-50%) scale(1.35,0);opacity:0}42%{transform:translate(-50%,-50%) scale(1.4,.7);opacity:.88}72%{transform:translate(-50%,-50%) scale(1.25,.3);opacity:.65}}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-mouth-pulse.ds-mouth-round .ds-mouth{--ds-mouth-width:.7;--ds-mouth-open:1.45;--ds-mouth-close:.5}
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-mouth-pulse.ds-mouth-wide .ds-mouth{--ds-mouth-width:1.4;--ds-mouth-open:.7;--ds-mouth-close:.3}
+
+
 @media(max-height:560px){#densai-helper-root .ds-mouth{width:3.6%}}
-@keyframes ds-mouth-talk{0%,100%{transform:translate(-50%,-50%) scaleY(0);opacity:0}42%{transform:translate(-50%,-50%) scaleY(1);opacity:.88}72%{transform:translate(-50%,-50%) scaleY(.42);opacity:.65}}
+@keyframes ds-mouth-talk{0%,100%{transform:translate(-50%,-50%) scale(var(--ds-mouth-width,1),0);opacity:0}42%{transform:translate(-50%,-50%) scale(var(--ds-mouth-width,1),var(--ds-mouth-open,1));opacity:.88}72%{transform:translate(-50%,-50%) scale(var(--ds-mouth-width,1),var(--ds-mouth-close,.42));opacity:.65}}
 
 
 
