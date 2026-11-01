@@ -94,6 +94,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-mouth{position:absolute;left:50%;top:27.8%;width:5.8%;height:2.0%;z-index:5;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at 50% 65%,#4c2820 0%,#25120f 75%);transform:translate(-50%,-50%) scaleY(0);opacity:0;transform-origin:center}
 #densai-helper-root .ds-person.ds-speaking:not(.ds-word-mode) .ds-mouth{animation:ds-mouth-talk .38s ease-in-out infinite}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse .ds-mouth{animation:ds-mouth-talk var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
+/* One-letter unvoiced Russian prepositions should not open the jaw. */
+#densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-closed .ds-mouth{animation:none;opacity:0;transform:translate(-50%,-50%) scaleY(0)}
 /* Approximate the first vowel of a spoken word; do not replace the original face artwork. */
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-round .ds-mouth{animation:ds-mouth-round var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
 #densai-helper-root .ds-person.ds-speaking.ds-word-mode.ds-word-pulse.ds-mouth-wide .ds-mouth{animation:ds-mouth-wide var(--ds-mouth-duration,.27s) ease-out var(--ds-mouth-iterations,1)}
@@ -571,7 +573,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     clearTimeout(speechEndTimer);speechEndTimer=null;
     clearTimeout(speechPauseTimer);speechPauseTimer=null;
     clearTimeout(speechHealthTimer);speechHealthTimer=null;speechInactiveChecks=0;
-    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide','ds-speech-paused');
+    character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide','ds-mouth-closed','ds-speech-paused');
   }
   function stopSpeech(){speechToken++;clearSpeechMotion();if(speechOwnsUtterance&&'speechSynthesis' in window){speechOwnsUtterance=false;try{speechSynthesis.cancel()}catch(e){}}}
   // Both sound controls must reflect the same state, including voice-engine failures.
@@ -648,7 +650,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
           // Route silent engine pauses through the normal pause handler. This also
           // suspends the active-speech timeout while audio is genuinely paused.
           if(speechStarted){u.onpause();return;}
-          character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
+          character.classList.remove('ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide','ds-mouth-closed');
           character.classList.add('ds-speech-paused');
           speechInactiveChecks=0;
           // Some engines never fire onpause. Bound the silent pause separately
@@ -797,6 +799,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Open the original mouth overlay once per syllable, with a minimum beat interval.
         // This follows word timing, not phoneme-level audio analysis.
         const syllables=(spokenWord.match(/[аоуыэяёюеиaeiouy]/giu)||[]).length;
+        // Keep the mouth closed for the short consonant-only prepositions в, к and с.
+        character.classList.toggle('ds-mouth-closed',syllables===0&&/^[вкс]$/iu.test(spokenWord));
         const mouthBeats=Math.max(1,Math.min(3,syllables,Math.floor(mouthDuration/.16)));
         // Match the head/hand gesture to each spoken word, rather than using a fixed 270ms nod.
         character.style.setProperty('--ds-word-gesture-duration',Math.max(.23,Math.min(.4,mouthDuration)).toFixed(2)+'s');
@@ -884,7 +888,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       clearTimeout(hintTimer);hintTimer=null;hint.textContent='Привет! 👋 Тыкни на меня!';
       clearTimeout(speechBeatTimer);speechBeatTimer=null;
       clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
-      character.classList.remove('ds-ack','ds-hit','ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide');
+      character.classList.remove('ds-ack','ds-hit','ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide','ds-mouth-closed');
       character.classList.add('ds-idle');
     }
     root.dataset.minimized=String(next);
