@@ -108,7 +108,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-person.ds-hit:not(.ds-speech-paused) .ds-hit-star{animation:ds-star .65s ease-out}
 #densai-helper-root .ds-tools{display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:auto;margin-top:-7px;position:relative}
 #densai-helper-root .ds-open{background:linear-gradient(105deg,#0875c8,#03bcf4);border:1px solid #8cf3ff;border-radius:22px;padding:10px 15px;white-space:nowrap;font-weight:750;font-size:12px;box-shadow:0 3px 19px #0abfff99;color:white}
-#densai-helper-root .ds-sound{background:#112e48e8;border:1px solid #346784;border-radius:50%;width:34px;height:34px;display:grid;place-items:center;font-size:16px;padding:0}
+#densai-helper-root .ds-sound{background:#112e48e8;border:1px solid #346784;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;font-size:16px;padding:0}
 #densai-helper-root .ds-sound:disabled{opacity:.55;cursor:not-allowed}
 #densai-helper-root .ds-head-sound{flex:none}
 #densai-helper-root .ds-window{pointer-events:auto;display:none;position:fixed;bottom:calc(12px + env(safe-area-inset-bottom,0px));right:clamp(190px,calc(1.8vw + 175px),220px);width:min(365px,calc(100vw - 24px));max-height:min(590px,calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)));overflow:hidden;flex-direction:column;background:#09182af7;color:#eefaff;border:1px solid #47c9ff;border-radius:20px;box-shadow:0 20px 55px #000c,0 0 20px #04c3ff25;backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
@@ -118,7 +118,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 #densai-helper-root .ds-heading{flex:1;min-width:0}
 #densai-helper-root .ds-heading strong{font-size:15px;display:block}
 #densai-helper-root .ds-heading small{color:#92bcd6;font-size:11px;display:block}
-#densai-helper-root .ds-exit{border:0;background:transparent;color:#d0edff;font-size:25px;width:35px;height:35px;display:grid;place-items:center;padding:0;border-radius:10px}
+#densai-helper-root .ds-exit{border:0;background:transparent;color:#d0edff;font-size:25px;width:44px;height:44px;display:grid;place-items:center;padding:0;border-radius:10px}
 #densai-helper-root .ds-exit:hover{background:#173247}
 #densai-helper-root .ds-conversation{overflow-y:auto;flex:1;min-height:115px;max-height:min(270px,35svh);padding:15px 13px;display:flex;flex-direction:column;gap:9px}
 #densai-helper-root .ds-bubble{font-size:12px;line-height:1.5;max-width:91%;padding:9px 11px;border-radius:13px;overflow-wrap:anywhere;white-space:pre-wrap}
@@ -149,7 +149,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
 @keyframes ds-star{0%{transform:scale(.3) rotate(-20deg);opacity:0}25%{opacity:1}100%{transform:scale(1.5) rotate(30deg) translateY(-27px);opacity:0}}
 @keyframes ds-hint-in{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes ds-panel-in{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
-@media(max-width:650px){#densai-helper-root{width:126px;right:6px}#densai-helper-root .ds-person{width:116px;height:177px}#densai-helper-root .ds-hint{bottom:108px;right:calc(100% - 15px);min-width:120px;font-size:11px;padding:9px}#densai-helper-root .ds-open{font-size:11px;padding:8px 10px}#densai-helper-root .ds-tools{align-self:flex-end}#densai-helper-root .ds-sound{width:40px;height:40px;font-size:16px}#densai-helper-root .ds-window{bottom:calc(100% + 9px);right:0}#densai-helper-root .ds-conversation{max-height:min(270px,34svh)}}
+@media(max-width:650px){#densai-helper-root{width:126px;right:6px}#densai-helper-root .ds-person{width:116px;height:177px}#densai-helper-root .ds-hint{bottom:108px;right:calc(100% - 15px);min-width:120px;font-size:11px;padding:9px}#densai-helper-root .ds-open{font-size:11px;padding:8px 10px}#densai-helper-root .ds-tools{align-self:flex-end}#densai-helper-root .ds-sound{width:44px;height:44px;font-size:16px}#densai-helper-root .ds-window{bottom:calc(100% + 9px);right:0}#densai-helper-root .ds-conversation{max-height:min(270px,34svh)}}
 @media(max-height:560px){#densai-helper-root .ds-person{height:112px}#densai-helper-root .ds-window{max-height:calc(100svh - 28px)}#densai-helper-root .ds-conversation{max-height:130px}}
 @media(prefers-reduced-motion:reduce){#densai-helper-root *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:0ms!important}}
 /* Small screens: keep the close button and the chat within the viewport. */
@@ -176,7 +176,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
  #densai-helper-root .ds-head{flex:0 0 auto;padding:5px 9px;gap:6px}
  #densai-helper-root .ds-avatar{width:28px;height:28px}
  #densai-helper-root .ds-heading small{display:none}
- #densai-helper-root .ds-exit{width:32px;height:32px}
+ #densai-helper-root .ds-exit{width:44px;height:44px}
  #densai-helper-root .ds-conversation{flex:1 1 auto;min-height:0;max-height:none;padding:7px 9px;overflow-y:auto}
  #densai-helper-root .ds-picks{flex:0 0 auto;max-height:0;padding:0;overflow:hidden}
  #densai-helper-root .ds-form{flex:0 0 auto;padding:5px 7px}
