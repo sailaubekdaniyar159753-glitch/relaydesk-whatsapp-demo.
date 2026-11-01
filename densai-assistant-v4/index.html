@@ -357,6 +357,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     if(/^(?:почему\s+(?:он\s+не\s+говорит\s+на\s+телефоне|персонаж\s+молчит|на\s+телефоне\s+нет\s+звука|не\s+отправляется\s+сообщение)|как\s+(?:мне\s+)?включить\s+звук\s+у\s+персонажа\s+на\s+телефоне|(?:не\s+работает\s+озвучка|не\s+отправляется\s+сообщение)(?:\s+на\s+телефоне)?)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
     // Mobile-first reports about this chat are widget help, not contact enquiries.
     if(/^на\s+телефоне\s+(?:не\s+отправляется\s+сообщение|не\s+работает\s+озвучка|нет\s+звука|не\s+открывается\s+чат)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
+    // Reports about this chat on a phone are help requests, not requests for our phone number.
+    if(/^(?:(?:почему\s+)?(?:(?:у\s+меня\s+)?(?:не\s+работает|не\s+открывается)\s+(?:этот\s+)?чат|(?:у\s+меня\s+)?(?:этот\s+)?чат\s+(?:не\s+работает|не\s+открывается|завис(?:ает)?))\s+на\s+телефоне|(?:почему\s+)?на\s+телефоне\s+(?:не\s+работает|не\s+открывается)\s+(?:этот\s+)?чат)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
     // Common mobile troubleshooting variants must not be routed as phone contacts.
     if(/^(?:(?:у\s+меня\s+)?на\s+телефоне\s+(?:чат\s+не\s+работает|не\s+работает\s+кнопка\s+отправить|нет\s+звука)|не\s+могу\s+отправить\s+сообщение\s+на\s+телефоне|чат\s+завис\s+на\s+телефоне)\s*[?!.]*$/iu.test(serviceQuery))return 'help';
     const patterns=[
