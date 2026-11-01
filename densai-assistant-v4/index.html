@@ -611,7 +611,9 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
               relativeOffsets=true;
               current=Math.min(current+1,words.length-1);
             }else{
-              const found=words.findIndex((word,i)=>word.index<=offset&&(i===words.length-1||words[i+1].index>offset));
+              const inside=words.findIndex(word=>word.index<=offset&&offset<word.index+word[0].length);
+              // Word-end or separator offsets belong to the upcoming word, not the previous one.
+              const found=inside>=0?inside:words.findIndex(word=>word.index>offset);
               if(found>=current)current=found;
               else current=Math.min(current+1,words.length-1);
             }
