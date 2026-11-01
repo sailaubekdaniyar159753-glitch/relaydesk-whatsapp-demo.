@@ -579,10 +579,11 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
   let muted=true; // Silent until the visitor explicitly enables voice; then replies are read aloud.
   let hits=0, animationTimer=null, hintTimer=null;
   const lines=['Ауч! 😵 Не бей так!','Эй, полегче! 😅','Я вообще-то работаю!','Хватит! Лучше спроси про сайт! 😄'];
-  let speechToken=0, speechOwnsUtterance=false, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, speechEndTimer=null, speechPauseTimer=null, speechHealthTimer=null, speechInactiveChecks=0, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
+  let speechToken=0, speechOwnsUtterance=false, speechBeatTimer=null, speechFallbackTimer=null, speechStartTimer=null, speechEndTimer=null, speechPauseTimer=null, speechHealthTimer=null, speechVowelTimer=null, speechInactiveChecks=0, lastWordBeat=-Infinity, wordHandLeft=false, wordBoundaryCount=0, lastBoundaryIndex=-1, lastBoundaryElapsed=-Infinity, lastBoundaryWall=-Infinity;
   function clearSpeechMotion(){
     clearTimeout(speechBeatTimer);speechBeatTimer=null;
     clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
+    clearTimeout(speechVowelTimer);speechVowelTimer=null;
     clearTimeout(speechStartTimer);speechStartTimer=null;
     clearTimeout(speechEndTimer);speechEndTimer=null;
     clearTimeout(speechPauseTimer);speechPauseTimer=null;
@@ -790,16 +791,20 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Keep the text cursor aligned while minimized or in reduced-motion mode.
         // Otherwise restoring the rig starts the mouth at an earlier word.
         const spokenWord=nextMouthWord(boundaryIndex);
+        clearTimeout(speechVowelTimer);speechVowelTimer=null; // Cancel remaining vowels from the previous word.
         // Reduced-motion users still need speech activity tracking, without visual gestures.
         if(motionPreference.matches||root.dataset.minimized==='true')return;
         // Update mouth shape for every accepted word, even when rapid gesture pulses are throttled.
         // A brief «в» or «к» must not keep the next vowel word's mouth closed.
-        const syllables=(spokenWord.match(/[аоуыэяёюеиaeiouy]/giu)||[]).length;
+        const vowels=(spokenWord.match(/[аоуыэяёюеиaeiouy]/giu)||[]).map(v=>v.toLowerCase());
+        const syllables=vowels.length;
         // Keep the mouth closed for the short consonant-only prepositions в, к and с.
         character.classList.toggle('ds-mouth-closed',syllables===0&&/^[вкс]$/iu.test(spokenWord));
-        const vowel=spokenWord?.match(/[аоуыэяёюеиaeiouy]/iu)?.[0]?.toLowerCase();
-        character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёюou]/u.test(vowel));
-        character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиыaeiy]/u.test(vowel));
+        const applyVowel=(vowel)=>{
+          character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёюou]/u.test(vowel));
+          character.classList.toggle('ds-mouth-wide',!!vowel&&/[аэяеиыaeiy]/u.test(vowel));
+        };
+        applyVowel(vowels[0]);
         // Every fresh word extends the inactivity window, even if its gesture is throttled.
         clearTimeout(speechFallbackTimer);
         speechFallbackTimer=setTimeout(()=>{
@@ -815,13 +820,28 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // are throttled: rapid words must not silently lose their lip movement.
         const letters=spokenWord.replace(/[^\p{L}]/gu,'').length;
         const mouthDuration=Math.max(.18,Math.min(.5,(.12+letters*.045)/u.rate));
-        const mouthBeats=Math.max(1,Math.min(3,syllables,Math.floor(mouthDuration/.16)));
+        const mouthBeats=Math.max(1,Math.min(3,syllables,Math.floor(mouthDuration/.12)));
         mouth.style.setProperty('--ds-mouth-iterations',String(mouthBeats));
         mouth.style.setProperty('--ds-mouth-duration',(mouthDuration/mouthBeats).toFixed(2)+'s');
         character.classList.add('ds-word-mode');
         character.classList.remove('ds-mouth-pulse');
         void mouth.offsetWidth; // Restart the original-mouth overlay without restarting head/hand.
         character.classList.add('ds-mouth-pulse');
+        // Change the mouth from one vowel shape to the next during a multi-syllable word.
+        // Timers are cancelled by the next word, pause, stop or minimization.
+        if(mouthBeats>1){
+          const beatMs=Math.round(mouthDuration*1000/mouthBeats);
+          const nextVowel=(beat)=>{
+            speechVowelTimer=setTimeout(()=>{
+              speechVowelTimer=null;
+              if(token!==speechToken||speechPaused||muted||document.hidden||root.dataset.minimized==='true'||motionPreference.matches||speechSynthesis.paused||!speechSynthesis.speaking)return;
+              const index=Math.round(beat*(vowels.length-1)/(mouthBeats-1));
+              applyVowel(vowels[index]);
+              if(beat+1<mouthBeats)nextVowel(beat+1);
+            },beatMs);
+          };
+          nextVowel(1);
+        }
         if(now-lastWordBeat<160)return;
         lastWordBeat=now;
         // Head/hand motion is deliberately slower than the mouth.
@@ -904,6 +924,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
       clearTimeout(hintTimer);hintTimer=null;hint.textContent='Привет! 👋 Тыкни на меня!';
       clearTimeout(speechBeatTimer);speechBeatTimer=null;
       clearTimeout(speechFallbackTimer);speechFallbackTimer=null;
+      clearTimeout(speechVowelTimer);speechVowelTimer=null;
       character.classList.remove('ds-ack','ds-hit','ds-speaking','ds-word-mode','ds-word-pulse','ds-word-left','ds-word-tilt','ds-hand-pulse','ds-mouth-round','ds-mouth-wide','ds-mouth-closed','ds-mouth-pulse');
       character.classList.add('ds-idle');
     }
