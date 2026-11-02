@@ -852,9 +852,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Animate the mouth for EVERY accepted word. Only head/hand gestures
         // are throttled: rapid words must not silently lose their lip movement.
         const letters=spokenWord.replace(/[^\p{L}]/gu,'').length;
-        const mouthDuration=Math.max(.18,Math.min(.5,(.12+letters*.045)/u.rate));
-        // Preserve a second lip movement in short two-syllable words (e.g. «оба»); keep each beat at least ~105 ms.
-        const mouthBeats=Math.max(1,Math.min(3,syllables,Math.floor(mouthDuration/.105)));
+        // Digits are spoken syllables too: avoid a single 180 ms mouth beat for «2026».
+        const digitCount=(spokenWord.match(/[0-9]/g)||[]).length;
+        const articulationUnits=letters+digitCount*2;
+        const mouthDuration=Math.max(.18,Math.min(digitCount?.65:.5,(.12+articulationUnits*.045)/u.rate));
+        // Allow up to four timed shapes for number-heavy words; ordinary words retain three.
+        const mouthBeats=Math.max(1,Math.min(digitCount?4:3,syllables,Math.floor(mouthDuration/.105)));
         mouth.style.setProperty('--ds-mouth-iterations',String(mouthBeats));
         mouth.style.setProperty('--ds-mouth-duration',(mouthDuration/mouthBeats).toFixed(2)+'s');
         character.classList.add('ds-word-mode');
