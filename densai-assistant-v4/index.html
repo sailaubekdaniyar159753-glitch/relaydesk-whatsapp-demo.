@@ -326,6 +326,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     const serviceQuery=q.trim().replace(/^(?:(?:здравствуйте|здравствуй|привет|добрый\s+(?:день|вечер|утро)|hello|hi|подскажите|скажите|пожалуйста)\s*[,!.\-–—]*\s*)+/iu,'').trim();
     // Recognize natural reports about this mascot's mouth without misrouting to deadlines.
     if(/^(?:почему\s+)?(?:у\s+него\s+)?не\s+(?:двигается|открывается)\s+рот(?:\s*,?\s*когда\s+(?:он|персонаж|помощник)\s+(?:говорит|разговаривает))?\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
+    // Lip-motion questions about this mascot are UI help, not delivery deadlines triggered by «когда».
+    if(/^(?:(?:почему\s+)?(?:у\s+(?:него|персонажа|помощника)\s+)?губы\s+не\s+(?:двигаются|шевелятся)|(?:почему\s+)?не\s+(?:двигаются|шевелятся)\s+губы)(?:\s*,?\s*когда\s+(?:он|персонаж|помощник)\s+(?:говорит|разговаривает)|\s+(?:при\s+озвучке|во\s+время\s+речи))?\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
     // An on-page send-button failure is chat troubleshooting, not a service enquiry.
     if(/^(?:у\s+меня\s+)?не\s+работает\s+кнопка\s+отправить\s*[?!.]*$/iu.test(serviceQuery))return 'help';
     // Questions about THIS widget's controls are help requests, not voice-over or bot orders.
