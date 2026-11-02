@@ -811,7 +811,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         if(motionPreference.matches||root.dataset.minimized==='true')return;
         // Update mouth shape for every accepted word, even when rapid gesture pulses are throttled.
         // A brief «в» or «к» must not keep the next vowel word's mouth closed.
-        const vowels=(spokenWord.match(/[аоуыэяёюеиaeiouy]/giu)||[]).map(v=>v.toLowerCase());
+        const vowelMatches=[...spokenWord.matchAll(/[аоуыэяёюеиaeiouy]/giu)];
+        const vowels=vowelMatches.map(match=>match[0].toLowerCase());
         const syllables=vowels.length;
         // Bilabial consonants (б/п/м, b/p/m) begin with closed lips.
         // Hold that pose briefly before the first vowel, without changing the original art.
@@ -848,14 +849,29 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Change the mouth from one vowel shape to the next during a multi-syllable word.
         // Timers are cancelled by the next word, pause, stop or minimization.
         const beatMs=Math.round(mouthDuration*1000/mouthBeats);
+        const canMoveMouth=()=>token===speechToken&&!speechPaused&&!muted&&!document.hidden&&root.dataset.minimized!=='true'&&!motionPreference.matches&&!speechSynthesis.paused&&speechSynthesis.speaking;
         const nextVowel=(beat)=>{
+          const index=Math.round(beat*(vowels.length-1)/(mouthBeats-1));
+          const previousIndex=Math.round((beat-1)*(vowels.length-1)/(mouthBeats-1));
+          // A second б/п/м between vowels briefly closes the original character's lips.
+          const between=spokenWord.slice(vowelMatches[previousIndex].index+1,vowelMatches[index].index);
+          const closureMs=/[бпмbpm]/iu.test(between)?Math.min(45,Math.round(beatMs*.25)):0;
           speechVowelTimer=setTimeout(()=>{
             speechVowelTimer=null;
-            if(token!==speechToken||speechPaused||muted||document.hidden||root.dataset.minimized==='true'||motionPreference.matches||speechSynthesis.paused||!speechSynthesis.speaking)return;
-            const index=Math.round(beat*(vowels.length-1)/(mouthBeats-1));
-            applyVowel(vowels[index]);
-            if(beat+1<mouthBeats)nextVowel(beat+1);
-          },beatMs);
+            if(!canMoveMouth())return;
+            if(closureMs){
+              character.classList.add('ds-mouth-closed');
+              speechVowelTimer=setTimeout(()=>{
+                speechVowelTimer=null;
+                if(!canMoveMouth())return;
+                applyVowel(vowels[index]);
+                if(beat+1<mouthBeats)nextVowel(beat+1);
+              },closureMs);
+            }else{
+              applyVowel(vowels[index]);
+              if(beat+1<mouthBeats)nextVowel(beat+1);
+            }
+          },Math.max(1,beatMs-closureMs));
         };
         if(bilabialOnset){
           speechVowelTimer=setTimeout(()=>{
