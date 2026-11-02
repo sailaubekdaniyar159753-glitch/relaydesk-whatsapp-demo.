@@ -820,6 +820,12 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Update mouth shape for every accepted word, even when rapid gesture pulses are throttled.
         // A brief «в» or «к» must not keep the next vowel word's mouth closed.
         const vowelMatches=[...spokenWord.matchAll(/[аоуыэяёюеиaeiouy]/giu)];
+        // Numbers and labels like «2026» or «3D» are pronounced aloud, not silent consonants.
+        // Approximate one vowel shape per digit rather than holding the original lips shut.
+        if(!vowelMatches.length){
+          const digitVowels=['о','и','а','и','е','я','е','е','о','я'];
+          for(const digit of spokenWord.matchAll(/[0-9]/g))vowelMatches.push({0:digitVowels[Number(digit[0])],index:digit.index});
+        }
         const vowels=vowelMatches.map(match=>match[0].toLowerCase());
         const syllables=vowels.length;
         // Bilabial consonants (б/п/м, b/p/m) begin with closed lips.
