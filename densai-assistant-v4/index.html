@@ -818,7 +818,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Hold that pose briefly before the first vowel, without changing the original art.
         const bilabialOnset=syllables>0&&/^[бпмbpm]/iu.test(spokenWord);
         character.classList.remove('ds-mouth-round','ds-mouth-wide');
-        character.classList.toggle('ds-mouth-closed',bilabialOnset||(syllables===0&&/^[вксбпм]$/iu.test(spokenWord)));
+        character.classList.toggle('ds-mouth-closed',bilabialOnset||syllables===0);
         const applyVowel=(vowel)=>{
           character.classList.remove('ds-mouth-closed');
           character.classList.toggle('ds-mouth-round',!!vowel&&/[оуёюou]/u.test(vowel));
