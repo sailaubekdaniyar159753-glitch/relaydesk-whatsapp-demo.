@@ -324,6 +324,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
     // Ignore greetings and polite lead-ins only when matching a general services question.
     // Price, deadlines and specific service requests still use the untouched original text.
     const serviceQuery=q.trim().replace(/^(?:(?:здравствуйте|здравствуй|привет|добрый\s+(?:день|вечер|утро)|hello|hi|подскажите|скажите|пожалуйста)\s*[,!.\-–—]*\s*)+/iu,'').trim();
+    // Natural lip complaints about THIS mascot must not be mistaken for order deadlines.
+    if(/^(?:почему\s+)?(?:(?:у\s+(?:него|персонажа|помощника)\s+)?рот\s+не\s+(?:двигается|открывается|шевелится)|(?:у\s+(?:него|персонажа|помощника)\s+)?не\s+(?:двигается|открывается|шевелится)\s+рот|(?:он|персонаж|помощник)\s+не\s+шевелит\s+губами)(?:\s*,?\s*(?:когда\s+(?:он|персонаж|помощник)\s+(?:говорит|разговаривает)|во\s+время\s+речи|при\s+озвучке))?\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
     // Recognize natural reports about this mascot's mouth without misrouting to deadlines.
     if(/^(?:почему\s+)?(?:у\s+него\s+)?не\s+(?:двигается|открывается)\s+рот(?:\s*,?\s*когда\s+(?:он|персонаж|помощник)\s+(?:говорит|разговаривает))?\s*[?!.]*$/iu.test(serviceQuery))return 'motionHelp';
     // Lip-motion questions about this mascot are UI help, not delivery deadlines triggered by «когда».
