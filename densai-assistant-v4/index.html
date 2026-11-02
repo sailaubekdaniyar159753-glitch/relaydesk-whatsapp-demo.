@@ -637,6 +637,8 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
             // Keep that word instead of treating the lower offset as a new sentence.
             const activeWord=words[current];
             if(activeWord&&(offset<0||offset===previousOffset||
+              // Some voices restart the offset at zero relative to the resumed word.
+              (offset>=0&&offset<activeWord.index)||
               (offset>=activeWord.index&&offset<activeWord.index+activeWord[0].length))){
               previousOffset=offset;
               return activeWord[0];
