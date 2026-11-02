@@ -852,7 +852,7 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
         // Timers are cancelled by the next word, pause, stop or minimization.
         const beatMs=Math.round(mouthDuration*1000/mouthBeats);
         const canMoveMouth=()=>token===speechToken&&!speechPaused&&!muted&&!document.hidden&&root.dataset.minimized!=='true'&&!motionPreference.matches&&!speechSynthesis.paused&&speechSynthesis.speaking;
-        const nextVowel=(beat)=>{
+        const nextVowel=(beat,elapsedAdjustment=0)=>{
           const index=Math.round(beat*(vowels.length-1)/(mouthBeats-1));
           const previousIndex=Math.round((beat-1)*(vowels.length-1)/(mouthBeats-1));
           // A second б/п/м between vowels briefly closes the original character's lips.
@@ -873,15 +873,17 @@ h1{font-size:clamp(45px,6.6vw,93px);font-weight:900;line-height:1.06;letter-spac
               applyVowel(vowels[index]);
               if(beat+1<mouthBeats)nextVowel(beat+1);
             }
-          },Math.max(1,beatMs-closureMs));
+          },Math.max(1,beatMs-closureMs-elapsedAdjustment));
         };
         if(bilabialOnset){
+          // The first lip closure uses part of beat one; don't delay later vowels by it.
+          const onsetDelay=Math.min(70,Math.round(mouthDuration*220));
           speechVowelTimer=setTimeout(()=>{
             speechVowelTimer=null;
             if(token!==speechToken||speechPaused||muted||document.hidden||root.dataset.minimized==='true'||motionPreference.matches||speechSynthesis.paused||!speechSynthesis.speaking)return;
             applyVowel(vowels[0]);
-            if(mouthBeats>1)nextVowel(1);
-          },Math.min(70,Math.round(mouthDuration*220)));
+            if(mouthBeats>1)nextVowel(1,onsetDelay);
+          },onsetDelay);
         }else if(mouthBeats>1)nextVowel(1);
         if(now-lastWordBeat<160)return;
         lastWordBeat=now;
